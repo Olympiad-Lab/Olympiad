@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Olympiad Problem Lab | Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      font-family: system-ui, Arial, sans-serif;
+      color: #172033;
+      background: #f2f5fa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 14px 50px;
+    }
+
+    h1 { margin-bottom: 4px; }
+    .muted { color: #64748b; }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 18px 0;
+      border-radius: 14px;
+      border: 1px solid #e1e7f0;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 14px 0 5px;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    input, textarea, select {
+      border: 1px solid #cbd5e1;
+      background: white;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      background: #2457d6;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .secondary { background: #475569; }
+    .danger { background: #b42318; }
+    .green { background: #18794e; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .question {
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .question p { white-space: pre-wrap; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button { flex: 1; min-width: 110px; }
+
+    #dashboard { display: none; }
+    #status { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+      body { padding: 12px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Olympiad Problem Lab</h1>
+    <p class="muted">Question administration</p>
+  </header>
+
+  <section class="card" id="loginCard">
+    <h2>Admin login</h2>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+             autocomplete="current-password" required>
+
+      <button id="loginButton" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <main id="dashboard">
+    <section class="card">
+      <div class="row">
+        <div>
+          <h2>Admin dashboard</h2>
+          <p id="signedIn" class="muted"></p>
+        </div>
+        <div>
+          <button id="logoutButton" class="secondary">Log out</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 id="formTitle">Add a question</h2>
+
+      <form id="questionForm">
+        <input type="hidden" id="questionId">
+
+        <label for="topic">Section</label>
+        <select id="topic" required>
+          <option value="NT">Number Theory (NT)</option>
+          <option value="Combinatorics">Combinatorics</option>
+          <option value="Algebra">Algebra</option>
+          <option value="Geometry">Geometry</option>
+        </select>
+
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty" required>
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Advanced</option>
+          <option>Olympiad</option>
+        </select>
+
+        <label for="question">Question</label>
+        <textarea id="question" required
+          placeholder="Enter the problem statement"></textarea>
+
+        <label for="option0">Option A</label>
+        <input id="option0" required>
+
+        <label for="option1">Option B</label>
+        <input id="option1" required>
+
+        <label for="option2">Option C</label>
+        <input id="option2" required>
+
+        <label for="option3">Option D</label>
+        <input id="option3" required>
+
+        <label for="answer">Correct answer</label>
+        <select id="answer" required>
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+        </select>
+
+        <label for="hint">Hint</label>
+        <textarea id="hint" placeholder="Optional hint"></textarea>
+
+        <label for="solution">Step-by-step solution</label>
+        <textarea id="solution"
+          placeholder="Enter your original solution"></textarea>
+
+        <label>
+          <input type="checkbox" id="published" style="width:auto">
+          Publish this question for visitors
+        </label>
+
+        <button id="saveButton" type="submit">Save question</button>
+        <button id="cancelButton" class="secondary" type="button"
+          hidden>Cancel editing</button>
+        <button id="refreshButton" class="secondary" type="button">
+          Refresh questions
+        </button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Existing questions</h2>
+      <p class="muted">
+        Published questions are available to public visitors.
+        Drafts are visible only to authorized admins.
+      </p>
+      <div id="questionList">Loading questions...</div>
+    </section>
+  </main>
+
+<script>
+"use strict";
+
+const SUPABASE_URL =
+  "https://zuuhhsdnpuncazwtlyqt.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_0l4RpY5d3k5J0TjUOonutA_OH9RjODq";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let busy = false;
+
+function showStatus(message, isError = false) {
+  $("status").textContent = message;
+  $("status").style.color = isError ? "#b42318" : "#18794e";
+}
+
+function setBusy(value) {
+  busy = value;
+  $("loginButton").disabled = value;
+  $("saveButton").disabled = value;
+}
+
+async function verifyAdmin() {
+  const { data: { user }, error: userError } =
+    await db.auth.getUser();
+
+  if (userError || !user) {
+    currentUser = null;
+    $("dashboard").style.display = "none";
+    $("loginCard").style.display = "block";
+    return false;
+  }
+
+  const { data, error } = await db
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !data) {
+    currentUser = null;
+    await db.auth.signOut();
+    $("dashboard").style.display = "none";
+    $("loginCard").style.display = "block";
+    showStatus(
+      error
+        ? "Could not verify admin access: " + error.message
+        : "This account is not registered as an admin.",
+      true
+    );
+    return false;
+  }
+
+  currentUser = user;
+  $("loginCard").style.display = "none";
+  $("dashboard").style.display = "block";
+  $("signedIn").textContent = "Signed in as " + user.email;
+  showStatus("");
+  await loadQuestions();
+  return true;
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (busy) return;
+
+  setBusy(true);
+  showStatus("Signing in...");
+
+  try {
+    const { error } = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+
+    if (error) {
+      showStatus(error.message, true);
+      return;
+    }
+
+    await verifyAdmin();
+  } catch (error) {
+    showStatus(error.message || "Login failed.", true);
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("logoutButton").addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+  resetForm();
+
+  if (error) {
+    showStatus(error.message, true);
+    return;
+  }
+
+  currentUser = null;
+  $("dashboard").style.display = "none";
+  $("loginCard").style.display = "block";
+  showStatus("You have logged out.");
+});
+
+$("questionForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (busy) return;
+
+  setBusy(true);
+
+  try {
+    if (!(await verifySessionOnly())) {
+      showStatus("Your session expired. Please log in again.", true);
+      return;
+    }
+
+    const options = [
+      $("option0").value.trim(),
+      $("option1").value.trim(),
+      $("option2").value.trim(),
+      $("option3").value.trim()
+    ];
+
+    if (options.some(option => !option)) {
+      showStatus("Please fill in all four answer options.", true);
+      return;
+    }
+
+    const record = {
+      topic: $("topic").value,
+      difficulty: $("difficulty").value,
+      question: $("question").value.trim(),
+      options,
+      answer_index: Number($("answer").value),
+      hint: $("hint").value.trim(),
+      solution: $("solution").value.trim(),
+      published: $("published").checked,
+      updated_at: new Date().toISOString()
+    };
+
+    if (!record.question) {
+      showStatus("Enter the question statement.", true);
+      return;
+    }
+
+    const id = $("questionId").value;
+    let result;
+
+    if (id) {
+      result = await db.from("questions")
+        .update(record).eq("id", Number(id));
+    } else {
+      result = await db.from("questions").insert(record);
+    }
+
+    if (result.error) throw result.error;
+
+    showStatus(id ? "Question updated." : "Question created.");
+    resetForm();
+    await loadQuestions();
+  } catch (error) {
+    showStatus(error.message || "Could not save the question.", true);
+  } finally {
+    setBusy(false);
+  }
+});
+
+async function verifySessionOnly() {
+  const { data: { user }, error } = await db.auth.getUser();
+  if (error || !user) return false;
+
+  const { data, error: adminError } = await db
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (adminError || !data) return false;
+  currentUser = user;
+  return true;
+}
+
+async function loadQuestions() {
+  $("questionList").textContent = "Loading questions...";
+
+  const { data, error } = await db
+    .from("questions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    $("questionList").textContent =
+      "Could not load questions: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    $("questionList").textContent = "No questions yet.";
+    return;
+  }
+
+  $("questionList").replaceChildren();
+
+  for (const item of data) {
+    const card = document.createElement("article");
+    card.className = "question";
+
+    const title = document.createElement("h3");
+    title.textContent = item.topic + " · " + item.difficulty;
+
+    const statement = document.createElement("p");
+    statement.textContent = item.question;
+
+    const publication = document.createElement("p");
+    publication.textContent = item.published ? "Published" : "Draft";
+
+    const edit = document.createElement("button");
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editQuestion(item));
+
+    const toggle = document.createElement("button");
+    toggle.className = "green";
+    toggle.textContent = item.published ? "Unpublish" : "Publish";
+    toggle.addEventListener("click", () => togglePublished(item));
+
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", () => deleteQuestion(item));
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.append(edit, toggle, remove);
+
+    card.append(title, statement, publication, actions);
+    $("questionList").append(card);
+  }
+}
+
+function editQuestion(item) {
+  $("questionId").value = item.id;
+  $("topic").value = item.topic;
+  $("difficulty").value = item.difficulty;
+  $("question").value = item.question;
+
+  item.options.forEach((option, index) => {
+    $("option" + index).value = option;
+  });
+
+  $("answer").value = String(item.answer_index);
+  $("hint").value = item.hint || "";
+  $("solution").value = item.solution || "";
+  $("published").checked = item.published;
+
+  $("formTitle").textContent = "Edit question";
+  $("saveButton").textContent = "Update question";
+  $("cancelButton").hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function togglePublished(item) {
+  if (!(await verifySessionOnly())) {
+    showStatus("Please log in again.", true);
+    return;
+  }
+
+  const { error } = await db
+    .from("questions")
+    .update({
+      published: !item.published,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", item.id);
+
+  if (error) {
+    showStatus(error.message, true);
+    return;
+  }
+
+  showStatus(item.published ? "Question unpublished." : "Question published.");
+  await loadQuestions();
+}
+
+async function deleteQuestion(item) {
+  if (!confirm("Delete this question permanently?")) return;
+
+  if (!(await verifySessionOnly())) {
+    showStatus("Please log in again.", true);
+    return;
+  }
+
+  const { error } = await db
+    .from("questions")
+    .delete()
+    .eq("id", item.id);
+
+  if (error) {
+    showStatus(error.message, true);
+    return;
+  }
+
+  showStatus("Question deleted.");
+  if ($("questionId").value === String(item.id)) resetForm();
+  await loadQuestions();
+}
+
+function resetForm() {
+  $("questionForm").reset();
+  $("questionId").value = "";
+  $("formTitle").textContent = "Add a question";
+  $("saveButton").textContent = "Save question";
+  $("cancelButton").hidden = true;
+}
+
+$("cancelButton").addEventListener("click", resetForm);
+$("refreshButton").addEventListener("click", loadQuestions);
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") {
+    currentUser = null;
+    $("dashboard").style.display = "none";
+    $("loginCard").style.display = "block";
+  }
+});
+
+verifyAdmin().catch(error => {
+  showStatus(error.message || "Could not initialize admin panel.", true);
+});
+</script>
+</body>
+</html>
