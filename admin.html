@@ -1,0 +1,263 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | Olympiad Problem Lab</title>
+<style>
+body{margin:0;background:#0b1020;color:#edf2ff;font:16px system-ui,sans-serif}
+main{max-width:850px;margin:auto;padding:22px}
+.card{background:#141c30;border:1px solid #2c3955;border-radius:14px;padding:20px;margin:16px 0}
+input,textarea,select{box-sizing:border-box;width:100%;padding:11px;margin:5px 0 14px;
+border-radius:8px;border:1px solid #354361;background:#0b1020;color:#edf2ff}
+textarea{min-height:85px}
+button{padding:10px 14px;border:0;border-radius:8px;margin:4px;cursor:pointer;
+background:#78a9ff;color:#091326;font-weight:700}
+.secondary{background:#283650;color:#edf2ff}
+.row{border-top:1px solid #354361;padding:14px 0}
+small,.muted{color:#a5b2cc}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Olympiad Problem Lab</h1>
+<p class="muted">Admin question manager</p>
+
+<section class="card" id="loginBox">
+<h2>Admin login</h2>
+<label>Email</label><input id="email" type="email" autocomplete="username">
+<label>Password</label><input id="password" type="password" autocomplete="current-password">
+<button id="login">Log in</button>
+<p id="loginMessage" role="status"></p>
+</section>
+
+<section id="manager" class="hidden">
+<div class="card">
+<h2 id="formTitle">Add a question</h2>
+<form id="questionForm">
+<input id="questionId" type="hidden">
+<label>Topic</label>
+<select id="topic">
+<option value="NT">Number Theory</option>
+<option value="Combinatorics">Combinatorics</option>
+<option value="Algebra">Algebra</option>
+<option value="Geometry">Geometry</option>
+</select>
+<label>Difficulty</label>
+<select id="difficulty">
+<option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+</select>
+<label>Question</label><textarea id="question" required maxlength="5000"></textarea>
+<label>Option A</label><input id="o0" required maxlength="1000">
+<label>Option B</label><input id="o1" required maxlength="1000">
+<label>Option C</label><input id="o2" required maxlength="1000">
+<label>Option D</label><input id="o3" required maxlength="1000">
+<label>Correct answer</label>
+<select id="answer">
+<option value="0">A</option><option value="1">B</option>
+<option value="2">C</option><option value="3">D</option>
+</select>
+<label>Hint</label><textarea id="hint" maxlength="3000"></textarea>
+<label>Step-by-step solution</label><textarea id="solution" required maxlength="10000"></textarea>
+<label><input id="published" type="checkbox" style="width:auto"> Publish for all visitors</label>
+<button type="submit">Save question</button>
+<button type="button" class="secondary" id="reset">Clear form</button>
+<p id="formMessage" role="status"></p>
+</form>
+</div>
+
+<div class="card">
+<h2>Question bank</h2>
+<button class="secondary" id="refresh">Refresh list</button>
+<button class="secondary" id="logout">Log out</button>
+<p id="listMessage" role="status"></p>
+<div id="questionList"></div>
+</div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  Replace these two placeholders with the Supabase Project URL
+  and publishable key. Never put a secret/service-role key here.
+*/
+const SUPABASE_URL = "PASTE-YOUR-SUPABASE-PROJECT-URL";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE-YOUR-SUPABASE-PUBLISHABLE-KEY";
+
+const $ = id => document.getElementById(id);
+const loginBox = $("loginBox");
+const manager = $("manager");
+let sb;
+let rows = [];
+
+function message(id, text){ $(id).textContent = text; }
+
+function setupClient(){
+  if(!SUPABASE_URL.startsWith("https://") ||
+     SUPABASE_PUBLISHABLE_KEY.startsWith("PASTE-")){
+    message("loginMessage","Add your Supabase URL and publishable key in admin.html first.");
+    return false;
+  }
+  sb = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+  return true;
+}
+
+async function verifyAdmin(){
+  const {data:{user}} = await sb.auth.getUser();
+  if(!user){
+    loginBox.classList.remove("hidden");
+    manager.classList.add("hidden");
+    return false;
+  }
+  const {data,error} = await sb.from("admin_users")
+    .select("user_id").eq("user_id",user.id).maybeSingle();
+  if(error || !data){
+    await sb.auth.signOut();
+    loginBox.classList.remove("hidden");
+    manager.classList.add("hidden");
+    message("loginMessage","This account is not authorised as an admin.");
+    return false;
+  }
+  loginBox.classList.add("hidden");
+  manager.classList.remove("hidden");
+  await loadQuestions();
+  return true;
+}
+
+$("login").onclick = async () => {
+  if(!sb && !setupClient()) return;
+  message("loginMessage","Signing in…");
+  const {error} = await sb.auth.signInWithPassword({
+    email:$("email").value.trim(),
+    password:$("password").value
+  });
+  if(error){ message("loginMessage","Login failed. Check your credentials."); return; }
+  message("loginMessage","");
+  await verifyAdmin();
+};
+
+function resetForm(){
+  $("questionForm").reset();
+  $("questionId").value="";
+  $("formTitle").textContent="Add a question";
+  $("formMessage").textContent="";
+}
+$("reset").onclick = resetForm;
+
+$("questionForm").onsubmit = async event => {
+  event.preventDefault();
+  if(!sb || !(await verifyAdmin())) return;
+
+  const record = {
+    topic:$("topic").value,
+    difficulty:$("difficulty").value,
+    question:$("question").value.trim(),
+    options:[$("o0").value.trim(),$("o1").value.trim(),
+             $("o2").value.trim(),$("o3").value.trim()],
+    answer_index:Number($("answer").value),
+    hint:$("hint").value.trim(),
+    solution:$("solution").value.trim(),
+    published:$("published").checked,
+    updated_at:new Date().toISOString()
+  };
+  if(!record.question || record.options.some(x=>!x) || !record.solution){
+    message("formMessage","Fill in the question, all four options and the solution.");
+    return;
+  }
+
+  const id=$("questionId").value;
+  const result = id
+    ? await sb.from("questions").update(record).eq("id",Number(id)).select()
+    : await sb.from("questions").insert(record).select();
+
+  if(result.error){
+    message("formMessage","Save failed: "+result.error.message);
+    return;
+  }
+  message("formMessage",record.published ?
+    "Saved and published for all visitors." : "Saved as a draft.");
+  resetForm();
+  await loadQuestions();
+};
+
+async function loadQuestions(){
+  message("listMessage","Loading questions…");
+  const {data,error}=await sb.from("questions")
+    .select("*").order("created_at",{ascending:false});
+  if(error){message("listMessage","Could not load questions: "+error.message);return;}
+  rows=data||[];
+  $("questionList").replaceChildren();
+  message("listMessage",rows.length+" questions in the database.");
+  rows.forEach(q=>{
+    const row=document.createElement("div");
+    row.className="row";
+    const title=document.createElement("strong");
+    title.textContent=q.topic+" · "+q.difficulty+" · #"+q.id;
+    const status=document.createElement("p");
+    status.className="muted";
+    status.textContent=q.published?"Published":"Draft";
+    const prompt=document.createElement("p");
+    prompt.textContent=q.question;
+    const edit=document.createElement("button");
+    edit.textContent="Edit";
+    edit.onclick=()=>editQuestion(q.id);
+    const toggle=document.createElement("button");
+    toggle.className="secondary";
+    toggle.textContent=q.published?"Unpublish":"Publish";
+    toggle.onclick=()=>togglePublished(q);
+    const del=document.createElement("button");
+    del.className="secondary";
+    del.textContent="Delete";
+    del.onclick=()=>deleteQuestion(q.id);
+    row.append(title,status,prompt,edit,toggle,del);
+    $("questionList").append(row);
+  });
+}
+
+function editQuestion(id){
+  const q=rows.find(x=>x.id===id);
+  if(!q)return;
+  $("questionId").value=q.id;
+  $("topic").value=q.topic;
+  $("difficulty").value=q.difficulty;
+  $("question").value=q.question;
+  q.options.forEach((x,i)=>$("o"+i).value=x);
+  $("answer").value=String(q.answer_index);
+  $("hint").value=q.hint||"";
+  $("solution").value=q.solution||"";
+  $("published").checked=q.published;
+  $("formTitle").textContent="Edit question #"+q.id;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+async function togglePublished(q){
+  const {error}=await sb.from("questions")
+    .update({published:!q.published,updated_at:new Date().toISOString()})
+    .eq("id",q.id);
+  if(error){message("listMessage","Update failed: "+error.message);return;}
+  await loadQuestions();
+}
+async function deleteQuestion(id){
+  if(!confirm("Delete this question permanently?"))return;
+  const {error}=await sb.from("questions").delete().eq("id",id);
+  if(error){message("listMessage","Delete failed: "+error.message);return;}
+  await loadQuestions();
+}
+$("refresh").onclick=loadQuestions;
+$("logout").onclick=async()=>{
+  await sb.auth.signOut();
+  manager.classList.add("hidden");
+  loginBox.classList.remove("hidden");
+  message("loginMessage","You have logged out.");
+};
+
+if(setupClient()){
+  sb.auth.onAuthStateChange(()=>{});
+  verifyAdmin();
+}
+</script>
+</body>
+</html>
