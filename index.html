@@ -3,500 +3,510 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#142343">
 <title>Olympiad Problem Lab</title>
 
 <style>
 :root {
-  --navy: #142343;
-  --blue: #3559ed;
-  --light: #f3f6ff;
-  --border: #d8e1f5;
-  --text: #172544;
+  --navy:#142343;
+  --navy2:#1d3155;
+  --blue:#3559ed;
+  --light:#f3f6ff;
+  --border:#d8e1f5;
+  --text:#172544;
+  --muted:#687895;
+  --green:#159c64;
+  --red:#d94b4b;
 }
-* { box-sizing: border-box; }
+* {box-sizing:border-box}
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--light);
-  color: var(--text);
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--light);
+  color:var(--text);
 }
-.app { display: flex; min-height: 100vh; }
+button,input,select,textarea {font:inherit}
+button {cursor:pointer}
+button:disabled {opacity:.45;cursor:not-allowed}
+.app {min-height:100vh;display:flex}
 .sidebar {
-  width: 265px;
-  background: var(--navy);
-  color: white;
-  padding: 24px 16px;
-  flex-shrink: 0;
+  width:255px;flex-shrink:0;
+  background:var(--navy);color:white;
+  padding:20px 13px;
+  display:flex;flex-direction:column;
 }
 .brand {
-  font-size: 23px;
-  font-weight: bold;
-  line-height: 1.25;
-  padding: 0 10px 24px;
-  border-bottom: 1px solid #455372;
+  font-size:20px;font-weight:bold;
+  padding:8px 10px 20px;
+  border-bottom:1px solid #405172;
+  line-height:1.3;
 }
 .brand small {
-  display: block;
-  font-size: 12px;
-  color: #bdc9e6;
-  font-weight: normal;
-  margin-top: 7px;
+  display:block;font-size:12px;font-weight:normal;
+  color:#bdc9e6;margin-top:6px;
 }
 .nav-label {
-  color: #aebde0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1.3px;
-  margin: 25px 10px 10px;
+  color:#aebde0;font-size:11px;
+  letter-spacing:1.2px;text-transform:uppercase;
+  margin:23px 10px 8px;
 }
-.nav {
-  width: 100%;
-  display: block;
-  border: 0;
-  background: transparent;
-  color: #dbe4ff;
-  text-align: left;
-  padding: 13px 12px;
-  border-radius: 10px;
-  font-size: 15px;
-  margin: 5px 0;
-  cursor: pointer;
+.nav,.exam-nav {
+  display:flex;align-items:center;gap:10px;
+  width:100%;border:0;border-radius:9px;
+  padding:12px 11px;margin:3px 0;
+  color:#dbe4ff;background:transparent;
+  text-align:left;font-size:14px;
 }
-.nav:hover { background: #25375e; }
-.nav.active { background: var(--blue); color: white; }
-.nav.topic { padding-left: 22px; }
-.nav.question-link {
-  border-top: 1px solid #455372;
-  border-radius: 0;
-  margin-top: 20px;
-  padding-top: 22px;
+.nav:hover,.exam-nav:hover {background:#25375e}
+.nav.active,.exam-nav.active {background:var(--blue);color:white}
+.nav .arrow {margin-left:auto}
+.exam-list {display:none;padding-left:9px}
+.exam-list.open {display:block}
+.exam-nav {font-size:13px;padding:10px}
+.exam-nav small {display:block;color:#c5d2f1;margin-top:3px}
+.sidebar-footer {
+  margin-top:auto;color:#aebde0;
+  font-size:11px;padding:18px 9px 4px;
 }
-.main { flex: 1; min-width: 0; }
+.main {flex:1;min-width:0}
 .topbar {
-  background: white;
-  padding: 23px 30px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
+  background:white;border-bottom:1px solid var(--border);
+  padding:19px 26px;display:flex;align-items:center;
+  justify-content:space-between;gap:15px;
 }
-.topbar h1 { margin: 0 0 6px; font-size: 25px; }
-.topbar p { margin: 0; color: #657596; font-size: 14px; }
-.score {
-  background: #e8eeff;
-  color: #2444bd;
-  padding: 12px 15px;
-  border-radius: 12px;
-  font-weight: bold;
-  white-space: nowrap;
+.topbar h1 {font-size:23px;margin:0 0 6px}
+.topbar p {font-size:13px;color:var(--muted);margin:0}
+.top-actions {display:flex;gap:8px;align-items:center}
+.score-pill {
+  background:#e8eeff;color:#2444bd;
+  padding:11px 13px;border-radius:11px;
+  font-size:13px;font-weight:bold;white-space:nowrap;
 }
-.content { padding: 24px; max-width: 1100px; margin: auto; }
+.menu-toggle {display:none}
+.content {max-width:1150px;margin:auto;padding:24px}
 .card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 25px;
-  margin-bottom: 20px;
+  background:white;border:1px solid var(--border);
+  border-radius:15px;padding:21px;margin-bottom:17px;
+  min-width:0;
 }
-.question-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+.hero {
+  background:linear-gradient(135deg,#142343,#3559ed);
+  color:white;border:0;padding:27px;
 }
-.tag {
-  display: inline-block;
-  background: #e9edff;
-  color: #2946bd;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: bold;
+.hero h2 {margin:8px 0;font-size:27px}
+.hero p {color:#dbe4ff;line-height:1.6}
+.eyebrow {
+  font-size:11px;letter-spacing:1.2px;
+  text-transform:uppercase;font-weight:bold;
 }
-select, button { font: inherit; }
-select {
-  border: 1px solid var(--border);
-  background: white;
-  padding: 10px;
-  border-radius: 9px;
-  max-width: 100%;
-}
-.problem {
-  font-size: 21px;
-  line-height: 1.65;
-  margin: 25px 0;
-}
-.option {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 13px;
-  margin: 10px 0;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-}
-.option:hover { background: #f5f7ff; }
-.option input { accent-color: var(--blue); }
-.option.correct { border-color: #159c64; background: #eafaf2; }
-.option.wrong { border-color: #df5454; background: #fff0f0; }
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 22px;
-}
+.grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.grid.two {grid-template-columns:repeat(2,minmax(0,1fr))}
+.stat {padding:17px}
+.stat .number {font-size:27px;font-weight:bold;margin:9px 0}
+.stat .label {font-size:12px;color:var(--muted)}
+.stat .symbol {font-size:20px}
+.row {display:flex;align-items:center;gap:10px}
+.between {justify-content:space-between}
+.wrap {flex-wrap:wrap}
+.grow {flex:1;min-width:0}
+.muted {color:var(--muted);font-size:13px;line-height:1.6}
+.small {font-size:12px}
+h2 {font-size:20px;margin:0 0 12px}
+h3 {font-size:16px;margin:0 0 9px}
+p {line-height:1.65}
 .btn {
-  border: 1px solid var(--border);
-  background: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
+  border:1px solid var(--border);background:white;color:var(--text);
+  padding:10px 13px;border-radius:9px;font-size:13px;
 }
-.btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
-.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:hover {border-color:#8299df}
+.btn.primary {background:var(--blue);color:white;border-color:var(--blue)}
+.btn.dark {background:var(--navy);color:white;border-color:var(--navy)}
+.btn.danger {color:var(--red)}
+.btn.full {width:100%}
+.btn-row {display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.tabs {display:flex;gap:7px;flex-wrap:wrap;margin-bottom:17px}
+.tab {
+  padding:10px 12px;border:1px solid var(--border);
+  border-radius:9px;background:white;font-size:13px;
+}
+.tab.active {background:var(--navy);color:white;border-color:var(--navy)}
+.section-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.section-card {
+  text-align:left;border:1px solid var(--border);
+  border-radius:12px;padding:16px;background:white;color:var(--text);
+}
+.section-card:hover {border-color:var(--blue);background:#f8f9ff}
+.section-card strong {display:block;margin-bottom:7px}
+.tag {
+  display:inline-block;background:#e9edff;color:#2946bd;
+  padding:6px 9px;border-radius:20px;font-size:11px;font-weight:bold;
+}
+.field {margin:13px 0}
+.field label {display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+.field input,.field select,.field textarea {
+  width:100%;padding:11px;border:1px solid var(--border);
+  border-radius:9px;background:white;color:var(--text);
+}
+.field textarea {min-height:120px;resize:vertical}
+.problem {font-size:19px;line-height:1.7;margin:22px 0}
+.option {
+  display:flex;align-items:flex-start;gap:10px;
+  padding:13px;margin:9px 0;border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;line-height:1.5;
+}
+.option:hover {background:#f7f8ff}
+.option input {margin-top:4px;accent-color:var(--blue)}
+.option.correct {border-color:var(--green);background:#eafaf2}
+.option.wrong {border-color:var(--red);background:#fff0f0}
 .feedback {
-  margin-top: 18px;
-  padding: 14px;
-  border-radius: 10px;
-  background: #f1f5ff;
-  line-height: 1.6;
-  display: none;
+  padding:13px;border-radius:9px;margin-top:12px;
+  background:#edf2ff;line-height:1.65;white-space:pre-wrap;
 }
-.feedback.show { display: block; }
-.list-item {
-  padding: 15px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin: 10px 0;
-  cursor: pointer;
-  background: white;
+.feedback.good {background:#eafaf2}
+.feedback.bad {background:#fff0f0}
+.list-row {
+  padding:14px 0;border-bottom:1px solid var(--border);
 }
-.list-item:hover { background: #f2f5ff; }
-.muted { color: #687895; font-size: 14px; }
-.mobile-menu { display: none; }
-
-@media (max-width: 700px) {
-  .app { display: block; }
-  .sidebar { width: 100%; padding: 14px; }
-  .brand { padding-bottom: 12px; }
-  .nav-label { margin-top: 15px; }
-  .nav { display: inline-block; width: auto; margin: 3px; }
-  .nav.topic { padding-left: 12px; }
-  .nav.question-link { border-top: 0; margin-top: 3px; padding-top: 13px; }
-  .topbar { padding: 18px; align-items: flex-start; }
-  .topbar h1 { font-size: 21px; }
-  .score { padding: 10px; font-size: 13px; }
-  .content { padding: 12px; }
-  .card { padding: 17px; }
-  .problem { font-size: 18px; }
+.list-row:last-child {border-bottom:0}
+.bar-row {margin:15px 0}
+.bar-head {display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:7px}
+.bar-bg {height:9px;background:#e8edf8;border-radius:9px;overflow:hidden}
+.bar-fill {height:100%;background:var(--blue);border-radius:9px}
+.history-item {
+  border:1px solid var(--border);border-radius:10px;
+  padding:13px;margin:9px 0;
+}
+.empty {
+  padding:22px;text-align:center;background:#f8faff;
+  border:1px dashed #c5d2eb;border-radius:12px;
+}
+.timer {font-size:22px;font-weight:bold;color:var(--blue)}
+.toast {
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:white;padding:12px 17px;
+  border-radius:10px;z-index:10;display:none;max-width:90%;
+  font-size:13px;
+}
+.footer-note {font-size:11px;color:var(--muted);margin:15px 0}
+@media(max-width:900px) {
+  .grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px) {
+  .app {display:block}
+  .sidebar {width:100%;padding:12px}
+  .brand {padding:6px 8px 13px}
+  .nav-label {margin:14px 8px 5px}
+  .nav {display:inline-flex;width:auto;margin:2px;padding:10px}
+  .exam-list {padding-left:0}
+  .exam-nav {display:inline-flex;width:auto;vertical-align:top}
+  .exam-nav small {display:none}
+  .sidebar-footer {display:none}
+  .topbar {padding:15px;align-items:flex-start}
+  .topbar h1 {font-size:19px}
+  .topbar p {font-size:12px}
+  .menu-toggle {display:inline-block}
+  .score-pill {font-size:11px;padding:9px}
+  .content {padding:12px}
+  .card {padding:16px}
+  .hero {padding:20px}
+  .hero h2 {font-size:23px}
+  .grid {gap:9px}
+  .stat {padding:12px}
+  .stat .number {font-size:23px}
+  .section-grid {grid-template-columns:1fr}
+  .problem {font-size:17px}
 }
 </style>
 </head>
-
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand">
-      🏆 Olympiad Problem Lab
+    <div class="brand">🏆 Olympiad Problem Lab
       <small>Think · Solve · Grow</small>
     </div>
 
-    <div class="nav-label">Olympiad</div>
-    <button class="nav active" data-view="ioqm">🏆 IOQM</button>
+    <div class="nav-label">Main menu</div>
+    <button class="nav active" data-view="dashboard">▦ Dashboard</button>
+    <button class="nav" data-view="about">ⓘ About Us</button>
+    <button class="nav" data-view="questions">▤ All Questions</button>
+    <button class="nav" data-view="feedback">✉ Query / Feedback</button>
 
-    <div class="nav-label">IOQM Sections</div>
-    <button class="nav topic" data-section="NT">π &nbsp; Number Theory (NT)</button>
-    <button class="nav topic" data-section="Combinatorics">♧ &nbsp; Combinatorics</button>
-    <button class="nav topic" data-section="Algebra">x² &nbsp; Algebra</button>
-    <button class="nav topic" data-section="Geometry">△ &nbsp; Geometry</button>
-
-    <button class="nav question-link" data-view="questions">▤ &nbsp; Question Section</button>
+    <div class="nav-label">Preparation</div>
+    <button class="nav" id="olympiadsToggle" aria-expanded="true">
+      🎓 Olympiads <span class="arrow" id="olympiadsArrow">⌄</span>
+    </button>
+    <div class="exam-list open" id="examList">
+      <button class="exam-nav active" data-exam="IOQM">🏆 <span>IOQM<small>Mathematics</small></span></button>
+      <button class="exam-nav" data-exam="NSEP">⚛ <span>NSEP<small>Physics</small></span></button>
+      <button class="exam-nav" data-exam="NSEC">🧪 <span>NSEC<small>Chemistry</small></span></button>
+      <button class="exam-nav" data-exam="NSEB">🧬 <span>NSEB<small>Biology</small></span></button>
+    </div>
+    <div class="sidebar-footer">Student mode · No login required<br>Progress is saved in this browser.</div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <div>
-        <h1 id="pageTitle">IOQM Practice</h1>
-        <p id="subtitle">Build your problem-solving skills, one question at a time.</p>
+      <div class="row">
+        <button class="btn menu-toggle" id="topMenuBtn" aria-label="Toggle olympiad menu">☰</button>
+        <div>
+          <h1 id="pageTitle">Student Dashboard</h1>
+          <p id="subtitle">Your preparation, in one place.</p>
+        </div>
       </div>
-      <div class="score">⭐ Score: <span id="score">0</span>/<span id="total">5</span></div>
+      <div class="top-actions">
+        <div class="score-pill">Questions solved: <span id="headerSolved">0</span></div>
+      </div>
     </header>
-
     <div class="content" id="content"></div>
   </main>
 </div>
+<div class="toast" id="toast" role="status"></div>
 
+<!-- Supabase browser client. Only use the publishable key here, never a secret/service-role key. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const problems = [
+"use strict";
+
+/* ===== CONFIGURATION ===== */
+const SUPABASE_URL = "https://zuuhhsdnpuncazwtlyqt.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_0l4RpY5d3k5J0TjUOonutA_OH9RjODq";
+
+const supabaseClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
+
+const STORAGE_KEY = "opl_student_progress_v1";
+const EXAMS = {
+  IOQM: {
+    title:"IOQM", subject:"Mathematics",
+    description:"Build mathematical reasoning and olympiad problem-solving skills.",
+    sections:["Number Theory (NT)","Combinatorics","Algebra","Geometry"]
+  },
+  NSEP: {
+    title:"NSEP", subject:"Physics",
+    description:"Develop conceptual understanding and quantitative problem-solving.",
+    sections:["Mechanics","Electricity","Optics","Thermodynamics","Waves"]
+  },
+  NSEC: {
+    title:"NSEC", subject:"Chemistry",
+    description:"Practise chemical concepts, calculations, and scientific reasoning.",
+    sections:["Physical Chemistry","Organic Chemistry","Inorganic Chemistry"]
+  },
+  NSEB: {
+    title:"NSEB", subject:"Biology",
+    description:"Strengthen biological concepts, interpretation, and scientific reasoning.",
+    sections:["Cell Biology","Genetics","Ecology","Physiology","Evolution"]
+  }
+};
+
+/* ===== STARTER QUESTIONS =====
+   These are built-in examples. Add more questions through your admin panel.
+   Database questions are loaded separately when published. */
+const starterQuestions = [
   {
-    section: "NT",
-    topic: "Remainders and modular arithmetic",
-    question: "Find the smallest positive integer n that leaves remainder 2 when divided by 3 and remainder 3 when divided by 5.",
-    options: ["5", "8", "13", "18"],
-    answer: 1,
-    hint: "List numbers that leave remainder 3 when divided by 5. Which also leave remainder 2 when divided by 3?",
-    solution: "Numbers that leave remainder 3 when divided by 5 include 3, 8, 13, 18, ... Since 8 divided by 3 leaves remainder 2, the answer is 8."
+    id:"sample-ioqm-1",olympiad:"IOQM",section:"Number Theory (NT)",
+    topic:"Remainders and modular arithmetic",difficulty:"Beginner",
+    question:"Find the smallest positive integer n that leaves remainder 2 when divided by 3 and remainder 3 when divided by 5.",
+    options:["5","8","13","18"],answer:1,
+    hint:"List numbers that leave remainder 3 when divided by 5. Which also leave remainder 2 when divided by 3?",
+    solution:"The numbers include 3, 8, 13, 18, ... Since 8 leaves remainder 2 when divided by 3, the answer is 8."
   },
   {
-    section: "Combinatorics",
-    topic: "Counting and inclusion-exclusion",
-    question: "How many integers from 1 to 30 inclusive are divisible by 2 or 3?",
-    options: ["15", "20", "25", "30"],
-    answer: 1,
-    hint: "Count multiples of 2 and multiples of 3. Subtract numbers counted twice.",
-    solution: "There are 15 multiples of 2 and 10 multiples of 3. The 5 multiples of 6 were counted twice, so the total is 15 + 10 − 5 = 20."
+    id:"sample-ioqm-2",olympiad:"IOQM",section:"Combinatorics",
+    topic:"Counting and inclusion-exclusion",difficulty:"Beginner",
+    question:"How many integers from 1 to 30 inclusive are divisible by 2 or 3?",
+    options:["15","20","25","30"],answer:1,
+    hint:"Count multiples of 2 and multiples of 3, then subtract those counted twice.",
+    solution:"There are 15 multiples of 2 and 10 multiples of 3. The 5 multiples of 6 were counted twice. Total = 15 + 10 − 5 = 20."
   },
   {
-    section: "Algebra",
-    topic: "Identities and symmetric expressions",
-    question: "If x + y = 10 and xy = 21, what is x² + y²?",
-    options: ["42", "50", "58", "79"],
-    answer: 2,
-    hint: "Use (x + y)² = x² + 2xy + y².",
-    solution: "x² + y² = (x + y)² − 2xy = 10² − 2(21) = 100 − 42 = 58."
+    id:"sample-ioqm-3",olympiad:"IOQM",section:"Algebra",
+    topic:"Identities and symmetric expressions",difficulty:"Beginner",
+    question:"If x + y = 10 and xy = 21, what is x² + y²?",
+    options:["42","50","58","79"],answer:2,
+    hint:"Use (x + y)² = x² + 2xy + y².",
+    solution:"x² + y² = (x + y)² − 2xy = 100 − 42 = 58."
   },
   {
-    section: "Geometry",
-    topic: "Angles in triangles",
-    question: "The angles of a triangle are in the ratio 2 : 3 : 4. What is the largest angle?",
-    options: ["40°", "60°", "80°", "100°"],
-    answer: 2,
-    hint: "The three angles of a triangle add up to 180°.",
-    solution: "The ratio has 2 + 3 + 4 = 9 parts. Each part is 180° ÷ 9 = 20°. The largest angle is 4 × 20° = 80°."
+    id:"sample-ioqm-4",olympiad:"IOQM",section:"Geometry",
+    topic:"Angles in triangles",difficulty:"Beginner",
+    question:"The angles of a triangle are in the ratio 2 : 3 : 4. What is the largest angle?",
+    options:["40°","60°","80°","100°"],answer:2,
+    hint:"The angles of a triangle add up to 180°.",
+    solution:"There are 9 equal parts. Each part is 180° ÷ 9 = 20°. The largest angle is 4 × 20° = 80°."
   },
   {
-    section: "Combinatorics",
-    topic: "Arrangements and permutations",
-    question: "How many three-digit numbers can be formed from digits 1, 2, 3, 4, 5 without repeating a digit?",
-    options: ["15", "25", "60", "125"],
-    answer: 2,
-    hint: "There are 5 choices for the first digit, then 4, then 3.",
-    solution: "By the multiplication principle, there are 5 × 4 × 3 = 60 possible numbers."
+    id:"sample-ioqm-5",olympiad:"IOQM",section:"Combinatorics",
+    topic:"Arrangements and permutations",difficulty:"Beginner",
+    question:"How many three-digit numbers can be formed from digits 1, 2, 3, 4, 5 without repeating a digit?",
+    options:["15","25","60","125"],answer:2,
+    hint:"There are 5 choices for the first digit, then 4, then 3.",
+    solution:"By the multiplication principle, there are 5 × 4 × 3 = 60 possible numbers."
+  },
+  {
+    id:"sample-nsep-1",olympiad:"NSEP",section:"Mechanics",
+    topic:"Average speed",difficulty:"Beginner",
+    question:"A cyclist travels 100 metres in 20 seconds at constant speed. What is the speed?",
+    options:["2 m/s","4 m/s","5 m/s","10 m/s"],answer:2,
+    hint:"Speed = distance divided by time.",
+    solution:"Speed = 100 ÷ 20 = 5 m/s."
+  },
+  {
+    id:"sample-nsep-2",olympiad:"NSEP",section:"Mechanics",
+    topic:"Uniform acceleration",difficulty:"Beginner",
+    question:"An object starts from rest and accelerates uniformly at 2 m/s². What is its speed after 3 seconds?",
+    options:["2 m/s","3 m/s","5 m/s","6 m/s"],answer:3,
+    hint:"Use v = u + at.",
+    solution:"The initial speed u = 0, acceleration a = 2 m/s² and time t = 3 s. Therefore v = 0 + 2 × 3 = 6 m/s."
+  },
+  {
+    id:"sample-nsec-1",olympiad:"NSEC",section:"Inorganic Chemistry",
+    topic:"Atomic structure",difficulty:"Beginner",
+    question:"How many electrons are in a neutral oxygen atom with atomic number 8?",
+    options:["6","8","10","16"],answer:1,
+    hint:"In a neutral atom, the number of electrons equals the number of protons.",
+    solution:"Oxygen has atomic number 8, meaning it has 8 protons. A neutral atom therefore has 8 electrons."
+  },
+  {
+    id:"sample-nsec-2",olympiad:"NSEC",section:"Physical Chemistry",
+    topic:"Moles and molar mass",difficulty:"Beginner",
+    question:"Approximately how many moles are present in 18 g of water (H₂O)?",
+    options:["0.5 mol","1 mol","2 mol","18 mol"],answer:1,
+    hint:"The molar mass of H₂O is approximately 18 g/mol.",
+    solution:"Moles = mass ÷ molar mass = 18 g ÷ 18 g/mol = 1 mol."
+  },
+  {
+    id:"sample-nseb-1",olympiad:"NSEB",section:"Cell Biology",
+    topic:"Cell organelles",difficulty:"Beginner",
+    question:"Which cell organelle is most directly associated with aerobic ATP production?",
+    options:["Ribosome","Mitochondrion","Golgi apparatus","Lysosome"],answer:1,
+    hint:"Think of the organelle involved in cellular respiration.",
+    solution:"Mitochondria are the main site of aerobic cellular respiration and produce much of the cell's ATP."
+  },
+  {
+    id:"sample-nseb-2",olympiad:"NSEB",section:"Genetics",
+    topic:"Basic genetics",difficulty:"Beginner",
+    question:"How many copies of each autosomal gene does a typical diploid human cell carry, ignoring unusual cases?",
+    options:["One","Two","Three","Four"],answer:1,
+    hint:"Humans typically inherit one copy of an autosomal gene from each parent.",
+    solution:"A typical diploid cell has two copies of each autosomal gene, one inherited from each parent."
   }
 ];
 
-let selectedSection = "ALL";
-let current = 0;
-let answers = {};
-let checked = {};
-let activeView = "ioqm";
+/* ===== LOCAL STUDENT DATA ===== */
+function freshProgress() {
+  return {attempts:{},history:[],bookmarks:[],goals:{},feedbackDrafts:[]};
+}
+function loadProgress() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!saved || typeof saved !== "object") return freshProgress();
+    return {
+      ...freshProgress(),...saved,
+      attempts:saved.attempts || {},
+      history:Array.isArray(saved.history)?saved.history:[],
+      bookmarks:Array.isArray(saved.bookmarks)?saved.bookmarks:[],
+      goals:saved.goals || {},
+      feedbackDrafts:Array.isArray(saved.feedbackDrafts)?saved.feedbackDrafts:[]
+    };
+  } catch (e) { return freshProgress(); }
+}
+let progress = loadProgress();
+function saveProgress() {
+  try {
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));
+    updateHeader();
+  } catch (e) {
+    notify("Browser storage is full or unavailable. Export your progress or clear some browser storage.");
+  }
+}
+function updateHeader() {
+  const el = document.getElementById("headerSolved");
+  if (el) el.textContent = Object.values(progress.attempts).filter(a=>a.checked).length;
+}
+function notify(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.style.display = "block";
+  clearTimeout(notify.timer);
+  notify.timer = setTimeout(()=>el.style.display="none",2800);
+}
+
+/* ===== APPLICATION STATE ===== */
+let allQuestions = [...starterQuestions];
+let dbStatus = "loading";
+let currentExam = "IOQM";
+let view = "dashboard";
+let expandedOlympiads = true;
+let questionFilter = "ALL";
+let practiceSection = "ALL";
+let practiceIndex = 0;
+let testSetupMode = "full";
+let testSection = "ALL";
+let activeTest = null;
+let resultToShow = null;
+let activeQuestion = null;
+let practiceFeedback = "";
+let testTimer = null;
 
 const content = document.getElementById("content");
-const sectionNames = {
-  NT: "Number Theory (NT)",
-  Combinatorics: "Combinatorics",
-  Algebra: "Algebra",
-  Geometry: "Geometry"
-};
+const sectionFor = (exam,section) => section || (EXAMS[exam]?.sections[0] || "General");
 
-function visibleProblems() {
-  if (selectedSection === "ALL") return problems.map((p, i) => ({p, i}));
-  return problems.map((p, i) => ({p, i}))
-    .filter(item => item.p.section === selectedSection);
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[ch]);
 }
-
-function updateScore() {
-  const score = problems.reduce((sum, p, i) =>
-    sum + (checked[i] && answers[i] === p.answer ? 1 : 0), 0);
-  document.getElementById("score").textContent = score;
-  document.getElementById("total").textContent = problems.length;
+function prettyDate(value) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "Unknown date" :
+    d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
 }
-
-function setActiveNav() {
-  document.querySelectorAll(".nav").forEach(b => b.classList.remove("active"));
-  if (activeView === "questions") {
-    document.querySelector('[data-view="questions"]').classList.add("active");
-  } else if (selectedSection === "ALL") {
-    document.querySelector('[data-view="ioqm"]').classList.add("active");
-  } else {
-    const btn = document.querySelector(`[data-section="${selectedSection}"]`);
-    if (btn) btn.classList.add("active");
-  }
+function examQuestions(exam=currentExam) {
+  return allQuestions.filter(q=>q.olympiad===exam);
 }
-
-function render() {
-  setActiveNav();
-  updateScore();
-
-  const items = visibleProblems();
-  if (current >= items.length) current = 0;
-
-  if (activeView === "questions") {
-    renderQuestionList();
-    return;
-  }
-
-  document.getElementById("pageTitle").textContent =
-    selectedSection === "ALL" ? "IOQM Practice" : sectionNames[selectedSection];
-  document.getElementById("subtitle").textContent =
-    "Build your problem-solving skills, one question at a time.";
-
-  if (!items.length) {
-    content.innerHTML = "<div class='card'>No questions in this section yet.</div>";
-    return;
-  }
-
-  const item = items[current];
-  const p = item.p;
-  const originalIndex = item.i;
-  const isChecked = !!checked[originalIndex];
-
-  content.innerHTML = `
-    <section class="card">
-      <div class="question-head">
-        <span class="tag">${sectionNames[p.section]}</span>
-        <select id="problemPicker" aria-label="Choose question">
-          ${items.map((it, n) =>
-            `<option value="${n}" ${n === current ? "selected" : ""}>
-              Question ${n + 1} of ${items.length}
-            </option>`).join("")}
-        </select>
-      </div>
-
-      <p class="muted">${p.topic}</p>
-      <div class="problem">${p.question}</div>
-
-      <div id="options">
-        ${p.options.map((option, i) => {
-          let cls = "option";
-          if (isChecked && i === p.answer) cls += " correct";
-          else if (isChecked && answers[originalIndex] === i) cls += " wrong";
-          return `<label class="${cls}">
-            <input type="radio" name="answer" value="${i}"
-              ${answers[originalIndex] === i ? "checked" : ""}
-              ${isChecked ? "disabled" : ""}>
-            <strong>${String.fromCharCode(65 + i)}.</strong> ${option}
-          </label>`;
-        }).join("")}
-      </div>
-
-      <div class="actions">
-        <button class="btn" id="hintBtn">💡 Show Hint</button>
-        <button class="btn" id="solutionBtn">▤ Show Solution</button>
-        <button class="btn primary" id="checkBtn" ${isChecked ? "disabled" : ""}>
-          ✓ Check Answer
-        </button>
-      </div>
-
-      <div class="feedback" id="hintBox"></div>
-      <div class="feedback" id="solutionBox"></div>
-      <div class="feedback" id="resultBox"></div>
-    </section>
-
-    <section class="card question-head">
-      <button class="btn" id="prevBtn" ${current === 0 ? "disabled" : ""}>← Previous</button>
-      <span class="muted">Question ${current + 1} of ${items.length}</span>
-      <button class="btn primary" id="nextBtn" ${current === items.length - 1 ? "disabled" : ""}>Next →</button>
-    </section>
-  `;
-
-  document.getElementById("problemPicker").onchange = e => {
-    current = Number(e.target.value);
-    render();
-  };
-
-  document.querySelectorAll('input[name="answer"]').forEach(input => {
-    input.onchange = () => { answers[originalIndex] = Number(input.value); };
-  });
-
-  document.getElementById("hintBtn").onclick = () => {
-    const box = document.getElementById("hintBox");
-    box.textContent = "Hint: " + p.hint;
-    box.classList.add("show");
-  };
-
-  document.getElementById("solutionBtn").onclick = () => {
-    const box = document.getElementById("solutionBox");
-    box.textContent = "Solution: " + p.solution;
-    box.classList.add("show");
-  };
-
-  document.getElementById("checkBtn").onclick = () => {
-    if (answers[originalIndex] === undefined) {
-      alert("Select an answer first.");
-      return;
-    }
-    checked[originalIndex] = true;
-    render();
-    const box = document.getElementById("resultBox");
-    box.textContent = answers[originalIndex] === p.answer
-      ? "Correct! Nice work."
-      : "Not quite. Review the solution and try the next question.";
-    box.classList.add("show");
-  };
-
-  document.getElementById("prevBtn").onclick = () => {
-    if (current > 0) { current--; render(); }
-  };
-  document.getElementById("nextBtn").onclick = () => {
-    if (current < items.length - 1) { current++; render(); }
-  };
-
-  if (isChecked) {
-    const box = document.getElementById("resultBox");
-    box.textContent = answers[originalIndex] === p.answer
-      ? "Correct! Nice work."
-      : "Not quite. Review the solution and try the next question.";
-    box.classList.add("show");
-  }
+function sectionsFor(exam=currentExam) {
+  const found = [...new Set(examQuestions(exam).map(q=>q.section).filter(Boolean))];
+  return [...new Set([...(EXAMS[exam]?.sections||[]),...found])];
 }
-
-function renderQuestionList() {
-  document.getElementById("pageTitle").textContent = "Question Section";
-  document.getElementById("subtitle").textContent =
-    "Browse all available IOQM practice questions.";
-
-  content.innerHTML = `
-    <section class="card">
-      <h2>All Questions</h2>
-      <p class="muted">Choose a question to open it in the practice area.</p>
-      ${problems.map((p, i) => `
-        <div class="list-item" data-question="${i}">
-          <strong>${i + 1}. ${sectionNames[p.section]}</strong>
-          <p>${p.question}</p>
-          <span class="muted">${p.topic} · ${checked[i] ? "Attempted" : "Not attempted"}</span>
-        </div>
-      `).join("")}
-    </section>
-  `;
-
-  content.querySelectorAll("[data-question]").forEach(el => {
-    el.onclick = () => {
-      const targetIndex = Number(el.dataset.question);
-      selectedSection = "ALL";
-      activeView = "ioqm";
-      current = visibleProblems().findIndex(item => item.i === targetIndex);
-      render();
-    };
-  });
+function questionsInSection(exam,section) {
+  const qs = examQuestions(exam);
+  return section==="ALL" ? qs : qs.filter(q=>q.section===section);
 }
-
-document.querySelectorAll("[data-section]").forEach(btn => {
-  btn.onclick = () => {
-    selectedSection = btn.dataset.section;
-    activeView = "ioqm";
-    current = 0;
-    render();
-  };
-});
-
-document.querySelector('[data-view="ioqm"]').onclick = () => {
-  selectedSection = "ALL";
-  activeView = "ioqm";
-  current = 0;
-  render();
-};
-
-document.querySelector('[data-view="questions"]').onclick = () => {
-  activeView = "questions";
-  render();
-};
-
-render();
-</script>
-</body>
-</html>
+function answeredCount(exam) {
+  return examQuestions(exam).filter(q=>progress.attempts[q.id]?.checked).length;
+}
+function examHistory(exam) {
+  return progress.history.filter(h=>h.exam===exam);
+}
+function accuracyFor(exam) {
+  const qs = examQuestions(exam);
+  const done = qs.filter(q=>progress.attempts[q.id]?.checked);
+  if (!done.length) return null;
+  return Math.round(100*done.filter(q=>progress.attempts[q.id].correct).length/done.length);
+}
+function scoreForExam(exam) {
+  return examHistory(exam).filter(h=>h.total>0);
+}
+function updateNav() {
+  document.querySelectorAll("[data-view]").forEach(b=>
+    b.classList.toggle("active",b.dataset.view===view));
+  document.querySelectorAll("[data-exam]").forEach(b=>
+    b.classList.toggle("active",b.dataset.exam===currentExam && view==="exam"));
+  document.getElementById("examList").classList.toggle("open",expandedOlympiads);
+  document.getElementById("olympiadsToggle").setAttribute("aria-expanded",String(expandedOlympiads));
+  document.getElementById("olympiadsArrow").textContent=expandedOlympiads?"⌄":"›";
+  updateHeader();
+}
+function setPage(title,subtitle) {
+  document.getElementById("pageTitle").textContent=title;
+  document.getElementById("subtitle").textContent=subtitle;
+}
+function cardStat(symbol,label,value,extra="") {
+  return `<div class="card stat"><div class="symbol">${symbol}</div>
+    <div class="number">${escapeHTML(value)}</div>
+    <div class="label">${escapeHTML(label)}</div>
+    ${extra?`<div class="muted small">${escapeHTML(extra)}</div>`:""}</div>`;
+}
+functio
