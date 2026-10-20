@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="#142343" name="theme-color"/>
+  <title>
+   Olympiad Problem Lab | Admin
+  </title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  </script>
+  <script>
+   window.MathJax = { tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']], processEscapes: true }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }, startup: { typeset: false } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <style>
+   :root {
+  font-family: system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  color: #172033;
+  background: #f3f6fb;
+  --navy: #142343;
+  --blue: #3559ed;
+  --border: #dfe6f1;
+  --muted: #68758b
+}
+* {
+  box-sizing: border-box
+}
+body {
+  margin: 0
+}
+.shell {
+  max-width: 1150px;
+  margin: auto;
+  padding: 22px 16px 55px
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px
+}
+h1 {
+  font-size: clamp(23px,4vw,31px);
+  margin: 0 0 5px
+}
+h2 {
+  font-size: 20px;
+  margin: 0 0 14px
+}
+h3 {
+  font-size: 16px;
+  margin: 0 0 8px
+}
+p {
+  line-height: 1.55
+}
+.muted {
+  color: var(--muted);
+  font-size: 13px
+}
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 4px 16px #17203308
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 650;
+  margin: 13px 0 6px
+}
+input,textarea,select,button {
+  font: inherit
+}
+input:not([type=checkbox]),textarea,select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #172033
+}
+textarea {
+  min-height: 96px;
+  resize: vertical
+}
+input:focus,textarea:focus,select:focus {
+  outline: 3px solid #3559ed22;
+  border-color: var(--blue)
+}
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 14px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 650;
+  cursor: pointer
+}
+button:hover {
+  filter: brightness(.96)
+}
+button:disabled {
+  opacity: .55;
+  cursor: wait
+}
+.secondary {
+  background: #e9edf5;
+  color: #26344c
+}
+.danger {
+  background: #b42318
+}
+.green {
+  background: #18794e
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px
+}
+.three {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px
+}
+#dashboard {
+  display: none
+}
+#status {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-height: 20px;
+  font-size: 14px;
+  margin: 10px 2px
+}
+.top-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap
+}
+.top-actions button {
+  width: auto
+}
+.form-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 16px
+}
+.form-actions button {
+  flex: 1;
+  min-width: 145px
+}
+.question {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  margin: 11px 0;
+  overflow-wrap: anywhere
+}
+.question p {
+  white-space: pre-wrap;
+  margin: 9px 0
+}
+.question-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap
+}
+.pill {
+  display: inline-block;
+  padding: 5px 9px;
+  background: #edf0ff;
+  color: #3349c7;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 750
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px
+}
+.actions button {
+  flex: 1;
+  min-width: 100px
+}
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 10px 0
+}
+.check-label {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-weight: 600
+}
+.check-label input {
+  width: auto
+}
+.notice {
+  background: #f0f5ff;
+  border: 1px solid #dce6ff;
+  padding: 12px;
+  border-radius: 10px;
+  color: #34466b;
+  font-size: 13px;
+  line-height: 1.5
+}
+.count {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 7px 0
+}
+@media(max-width:650px) {
+  .shell {
+    padding: 15px 11px 35px
+  }
+  .card {
+    padding: 15px
+  }
+  .row,.three,.filters {
+    grid-template-columns: 1fr
+  }
+  header {
+    align-items: flex-start
+  }
+  .form-actions button {
+    min-width: 100%
+  }
+  .actions button {
+    min-width: 90px
+  }
+}
+   .preview-card { margin: 14px 0; padding: 14px; border: 1px solid #d8e1f5; border-radius: 10px; background: #f7f9ff; }
+   .preview-card h3 { margin: 0 0 8px; }
+   .math-content { overflow-wrap: anywhere; }
+   .report-item { border: 1px solid #d8e1f5; border-radius: 10px; padding: 14px; margin: 10px 0; background: #fff; }
+   .report-item.resolved { opacity: .72; }
+   .report-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+   .report-message { white-space:pre-wrap; overflow-wrap:anywhere; }
+  </style>
+ </head>
+ <body>
+  <div class="shell">
+   <header>
+    <div>
+     <h1>
+      Olympiad Problem Lab
+     </h1>
+     <div class="muted">
+      Admin workspace &middot; manage practice questions
+     </div>
+    </div>
+    <div class="top-actions">
+     <button class="secondary" hidden="" id="logoutButton">
+      Log out
+     </button>
+    </div>
+   </header>
+   <section class="card" id="loginCard">
+    <h2>
+     Admin login
+    </h2>
+    <p class="muted">
+     Sign in with the Supabase account registered in the admin_users table.
+    </p>
+    <form id="loginForm">
+     <label for="email">
+      Email
+     </label>
+     <input autocomplete="username" id="email" required="" type="email"/>
+     <label for="password">
+      Password
+     </label>
+     <input autocomplete="current-password" id="password" required="" type="password"/>
+     <div class="form-actions">
+      <button id="loginButton" type="submit">
+       Log in
+      </button>
+     </div>
+    </form>
+   </section>
+   <p aria-live="polite" id="status" role="status">
+   </p>
+   <main id="dashboard">
+    <section class="card">
+     <div class="question-top">
+      <div>
+       <h2>
+        Dashboard
+       </h2>
+       <p class="muted" id="signedIn">
+       </p>
+      </div>
+      <div class="top-actions">
+       <button id="newQuestionButton">
+        + New question
+       </button>
+       <button class="secondary" id="refreshButton">
+        Refresh list
+       </button>
+      </div>
+     </div>
+     <div class="notice">
+      Manage practice questions, topic sections, and reusable mock-test formats. Database errors will be shown beside the relevant section or list.
+     </div>
+     <div class="count" id="summary">
+     </div>
+    </section>
+    <section class="card" id="sectionManager">
+     <h2>
+      Topic section manager
+     </h2>
+     <p class="muted">
+      Create or delete sections for IOQM, NSEP, NSEC, and NSEB. Existing question topic names are preserved.
+     </p>
+     <form id="sectionForm">
+      <input id="sectionId" type="hidden"/>
+      <div class="row">
+       <div>
+        <label for="sectionOlympiad">
+         Olympiad
+        </label>
+        <select id="sectionOlympiad">
+         <option>
+          IOQM
+         </option>
+         <option>
+          NSEP
+         </option>
+         <option>
+          NSEC
+         </option>
+         <option>
+          NSEB
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="sectionName">
+         Section name
+        </label>
+        <input id="sectionName" maxlength="100" placeholder="e.g. Number Theory" required=""/>
+       </div>
+      </div>
+      <div class="form-actions">
+       <button id="saveSectionButton" type="submit">
+        Add section
+       </button>
+       <button class="secondary" hidden="" id="cancelSectionButton" type="button">
+        Cancel edit
+       </button>
+      </div>
+     </form>
+     <div class="form-actions">
+      <button class="secondary" id="refreshSectionsButton" type="button">
+       Reload sections
+      </button>
+     </div>
+     <div class="notice" hidden="" id="sectionLoadWarning">
+     </div>
+     <div class="count" id="sectionList">
+      Loading sections...
+     </div>
+    </section>
+    <section class="card" id="mockManager">
+     <h2>
+      Mock-test format manager
+     </h2>
+     <p class="muted">
+      Create named mock categories with their own duration, number of questions, marking scheme, and allowed question types. These settings are stored separately so you can edit or delete formats without changing question records.
+     </p>
+     <form id="mockForm">
+      <input id="mockId" type="hidden"/>
+      <div class="row">
+       <div>
+        <label for="mockExam">
+         Exam
+        </label>
+        <select id="mockExam">
+         <option>
+          IOQM
+         </option>
+         <option>
+          NSEP
+         </option>
+         <option>
+          NSEC
+         </option>
+         <option>
+          NSEB
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="mockName">
+         Mock category / format name
+        </label>
+        <input id="mockName" maxlength="120" placeholder="e.g. Full-length IOQM Mock" required=""/>
+       </div>
+      </div>
+      <div class="three">
+       <div>
+        <label for="mockDuration">
+         Duration (minutes)
+        </label>
+        <input id="mockDuration" max="1440" min="1" required="" type="number" value="180"/>
+       </div>
+       <div>
+        <label for="mockCount">
+         Number of questions
+        </label>
+        <input id="mockCount" max="500" min="1" required="" type="number" value="30"/>
+       </div>
+       <div>
+        <label for="mockPositive">
+         Marks per correct answer
+        </label>
+        <input id="mockPositive" min="0" required="" step="0.25" type="number" value="1"/>
+       </div>
+      </div>
+      <div class="three">
+       <div>
+        <label for="mockNegative">
+         Penalty per wrong answer
+        </label>
+        <input id="mockNegative" min="0" required="" step="0.25" type="number" value="0"/>
+       </div>
+       <div>
+        <label for="mockUnattempted">
+         Marks for unattempted
+        </label>
+        <input id="mockUnattempted" required="" step="0.25" type="number" value="0"/>
+       </div>
+       <div>
+        <label for="mockTotal">
+         Total marks (optional)
+        </label>
+        <input id="mockTotal" min="0" placeholder="Auto / not specified" step="0.25" type="number"/>
+       </div>
+      </div>
+      <label for="mockTypes">
+       Allowed question types
+      </label>
+      <select id="mockTypes" multiple="" size="3">
+       <option selected="" value="MCQ">
+        Single-correct MCQ
+       </option>
+       <option value="MULTIPLE_CORRECT">
+        Multiple-correct MCQ
+       </option>
+       <option value="INTEGER">
+        Integer answer
+       </option>
+      </select>
+      <p class="muted">
+       On Android, hold/tap to select multiple items depending on your browser. At least one type must be selected.
+      </p>
+      <label for="mockDescription">
+       Instructions / notes (optional)
+      </label>
+      <textarea id="mockDescription" placeholder="Exam-specific notes, section distribution, or rules"></textarea>
+      <label class="check-label">
+       <input checked="" id="mockActive" type="checkbox"/>
+       Available for use
+      </label>
+      <div class="form-actions">
+       <button id="saveMockButton" type="submit">
+        Save mock format
+       </button>
+       <button class="secondary" hidden="" id="cancelMockButton" type="button">
+        Cancel edit
+       </button>
+       <button class="secondary" id="clearMockButton" type="button">
+        Clear form
+       </button>
+      </div>
+     </form>
+     <div class="count" id="mockList">
+      Loading mock formats...
+     </div>
+    </section>
+    <section class="card" id="contentManager">
+     <h2>
+      Theory &amp; learning content manager
+     </h2>
+     <p class="muted">
+      Publish theory notes for any listed olympiad, or add IOQM-only problem-solving guides. Content is plain text with line breaks preserved on the public page. Keep it original or use material you have permission to publish.
+     </p>
+     <form id="contentForm">
+      <input id="contentId" type="hidden"/>
+      <div class="row">
+       <div>
+        <label for="contentType">
+         Content area
+        </label>
+        <select id="contentType">
+         <option value="THEORY">
+          Theory &amp; Notes
+         </option>
+         <option value="PROBLEM_SOLVING">
+          IOQM Problem Solving
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="contentExam">
+         Olympiad
+        </label>
+        <select id="contentExam">
+         <option>
+          IOQM
+         </option>
+         <option>
+          NSEP
+         </option>
+         <option>
+          NSEC
+         </option>
+         <option>
+          NSEB
+         </option>
+        </select>
+       </div>
+      </div>
+      <div class="row">
+       <div>
+        <label for="contentTitle">
+         Title
+        </label>
+        <input id="contentTitle" maxlength="180" placeholder="e.g. Useful divisibility tests" required=""/>
+       </div>
+       <div>
+        <label for="contentSection">
+         Topic / subsection (optional)
+        </label>
+        <input id="contentSection" maxlength="120" placeholder="e.g. Number Theory"/>
+       </div>
+      </div>
+      <label for="contentBody">
+       Content
+      </label>
+      <textarea id="contentBody" placeholder="Write your notes, explanation, method, worked example, or strategy. LaTeX: \(x^2\), \[\frac{a}{b}\]. Line breaks are preserved." required="" rows="10"></textarea>
+      <div class="preview-card"><h3>Notes preview</h3><p class="muted small">Math notation is rendered here and on the public site.</p><div id="contentMathPreview" class="math-content">Type notes above to preview them.</div></div>
+      <div class="row">
+       <div>
+        <label for="contentOrder">
+         Display order
+        </label>
+        <input id="contentOrder" max="100000" min="0" type="number" value="0"/>
+       </div>
+       <div>
+        <label class="check-label">
+         <input id="contentPublished" type="checkbox"/>
+         Publish on public website
+        </label>
+       </div>
+      </div>
+      <div class="form-actions">
+       <button id="saveContentButton" type="submit">
+        Save content
+       </button>
+       <button class="secondary" hidden="" id="cancelContentButton" type="button">
+        Cancel editing
+       </button>
+       <button class="secondary" id="clearContentButton" type="button">
+        Clear form
+       </button>
+       <button class="secondary" id="refreshContentButton" type="button">
+        Refresh content
+       </button>
+      </div>
+     </form>
+     <div class="count" id="contentList">
+      Loading learning content...
+     </div>
+    </section>
+    <section class="card" id="editorCard">
+     <h2 id="formTitle">
+      Add a question
+     </h2>
+     <form id="questionForm">
+      <input id="questionId" type="hidden"/>
+      <div class="row">
+       <div>
+        <label for="olympiad">
+         Olympiad
+        </label>
+        <select id="olympiad" required="">
+         <option value="IOQM">
+          IOQM &middot; Mathematics
+         </option>
+         <option value="NSEP">
+          NSEP &middot; Physics
+         </option>
+         <option value="NSEC">
+          NSEC &middot; Chemistry
+         </option>
+         <option value="NSEB">
+          NSEB &middot; Biology
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="topic">
+         Section
+        </label>
+        <select id="topic" required="">
+        </select>
+       </div>
+      </div>
+      <div class="row">
+       <div>
+        <label for="difficulty">
+         Difficulty
+        </label>
+        <select id="difficulty" required="">
+         <option>
+          Beginner
+         </option>
+         <option>
+          Intermediate
+         </option>
+         <option>
+          Advanced
+         </option>
+         <option>
+          Olympiad
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="questionType">
+         Question type
+        </label>
+        <select id="questionType">
+         <option value="MCQ">
+          Single-correct MCQ (4 options)
+         </option>
+         <option value="MULTIPLE_CORRECT">
+          Multiple-correct MCQ (select all correct)
+         </option>
+         <option value="INTEGER">
+          Integer answer
+         </option>
+        </select>
+       </div>
+      </div>
+      <label for="question">
+       Question
+      </label>
+      <textarea id="question" placeholder="Enter the complete problem statement" required=""></textarea>
+      <div class="row" id="mcqFields">
+       <div>
+        <label for="option0">
+         Option A
+        </label>
+        <input id="option0" required=""/>
+       </div>
+       <div>
+        <label for="option1">
+         Option B
+        </label>
+        <input id="option1" required=""/>
+       </div>
+       <div>
+        <label for="option2">
+         Option C
+        </label>
+        <input id="option2" required=""/>
+       </div>
+       <div>
+        <label for="option3">
+         Option D
+        </label>
+        <input id="option3" required=""/>
+       </div>
+      </div>
+      <div hidden="" id="multipleCorrectFields">
+       <label>
+        Correct options (select all that apply)
+       </label>
+       <div class="row">
+        <label class="check-label">
+         <input class="correctOption" type="checkbox" value="0"/>
+         A is correct
+        </label>
+        <label class="check-label">
+         <input class="correctOption" type="checkbox" value="1"/>
+         B is correct
+        </label>
+        <label class="check-label">
+         <input class="correctOption" type="checkbox" value="2"/>
+         C is correct
+        </label>
+        <label class="check-label">
+         <input class="correctOption" type="checkbox" value="3"/>
+         D is correct
+        </label>
+       </div>
+      </div>
+      <div hidden="" id="integerFields">
+       <label for="integerAnswer">
+        Correct integer answer
+       </label>
+       <input id="integerAnswer" inputmode="numeric" placeholder="e.g. 42" step="1" type="number"/>
+      </div>
+      <label for="imageUrl">
+       Question image URL (optional)
+      </label>
+      <input id="imageUrl" inputmode="url" placeholder="https://.../diagram.png" type="url"/>
+      <div class="row">
+       <div id="mcqAnswerField">
+        <label for="answer">
+         Correct answer
+        </label>
+        <select id="answer" required="">
+         <option value="0">
+          A
+         </option>
+         <option value="1">
+          B
+         </option>
+         <option value="2">
+          C
+         </option>
+         <option value="3">
+          D
+         </option>
+        </select>
+       </div>
+       <div>
+        <label for="published">
+         Publication
+        </label>
+        <label class="check-label">
+         <input id="published" type="checkbox"/>
+         Publish this question on the public website
+        </label>
+       </div>
+      </div>
+      <label for="hint">
+       Hint
+      </label>
+      <textarea id="hint" placeholder="Optional hint"></textarea>
+      <label for="solution">
+       Step-by-step solution
+      </label>
+      <textarea id="solution" placeholder="Enter your original solution. LaTeX supported: \(x^2\), \[\frac{a}{b}\]"></textarea>
+      <div class="preview-card" id="mathPreviewCard">
+       <h3>Math preview</h3>
+       <p class="muted small">Use \( ... \) for inline maths and \[ ... \] for display maths. Example: \(x^2 + y^2 = z^2\).</p>
+       <div id="mathPreview" class="math-content">Type a question or solution to preview its formatting.</div>
+      </div>
+      <div class="form-actions">
+       <button id="saveButton" type="submit">
+        Save question
+       </button>
+       <button class="secondary" hidden="" id="cancelButton" type="button">
+        Cancel editing
+       </button>
+       <button class="secondary" id="clearButton" type="button">
+        Clear form
+       </button>
+      </div>
+     </form>
+    </section>
+    <section class="card">
+     <h2>
+      Question library
+     </h2>
+     <p class="muted">
+      Filter the list to review one olympiad or section. Editing preserves the question ID.
+     </p>
+     <div class="filters">
+      <div>
+       <label for="filterOlympiad">
+        Filter by olympiad
+       </label>
+       <select id="filterOlympiad">
+        <option value="ALL">
+         All olympiads
+        </option>
+        <option>
+         IOQM
+        </option>
+        <option>
+         NSEP
+        </option>
+        <option>
+         NSEC
+        </option>
+        <option>
+         NSEB
+        </option>
+       </select>
+      </div>
+      <div>
+       <label for="filterPublication">
+        Filter by status
+       </label>
+       <select id="filterPublication">
+        <option value="ALL">
+         Published and drafts
+        </option>
+        <option value="PUBLISHED">
+         Published only
+        </option>
+        <option value="DRAFT">
+         Drafts only
+        </option>
+       </select>
+      </div>
+     </div>
+     <div id="questionList">
+      Loading questions...
+     </div>
+    </section>
+    <section class="card" id="reportsCard">
+     <div class="question-top"><div><h2>Question reports</h2><p class="muted">Student reports for incorrect answers, solutions, wording, difficulty, or display issues.</p></div><button class="secondary" id="refreshReportsButton" type="button">Refresh reports</button></div>
+     <div class="count" id="reportSummary">Reports load after admin verification.</div>
+     <div id="reportList">Sign in to view reports.</div>
+    </section>
+   </main>
+  </div>
+  <script>
+   "use strict";
+const SUPABASE_URL = "https://zuuhhsdnpuncazwtlyqt.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_0l4RpY5d3k5J0TjUOonutA_OH9RjODq";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const $ = id => document.getElementById(id);
+let reportItems = [];
+function typesetMath(node = document.body) {
+  if (!window.MathJax || !window.MathJax.typesetPromise || !node) return;
+  if (window.MathJax.typesetClear) window.MathJax.typesetClear([node]);
+  window.MathJax.typesetPromise([node]).catch(error => console.warn("Math rendering failed:", error));
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function refreshMathPreview() {
+  const preview = $("mathPreview"); if (!preview) return;
+  const q = $("question")?.value.trim() || "";
+  const opts = $("questionType")?.value === "INTEGER" ? "" : [0,1,2,3].map(i => $("option"+i)?.value.trim()).filter(Boolean).map((v,i) => `<div><strong>${String.fromCharCode(65+i)}.</strong> ${esc(v)}</div>`).join("");
+  const hint = $("hint")?.value.trim() || ""; const solution = $("solution")?.value.trim() || "";
+  preview.innerHTML = `${q ? `<div><strong>Question</strong><p>${esc(q).replace(/\n/g,"<br>")}</p></div>` : ""}${opts ? `<div><strong>Options</strong>${opts}</div>` : ""}${hint ? `<div><strong>Hint</strong><p>${esc(hint).replace(/\n/g,"<br>")}</p></div>` : ""}${solution ? `<div><strong>Solution</strong><p>${esc(solution).replace(/\n/g,"<br>")}</p></div>` : ""}` || "Type a question or solution to preview its formatting.";
+  typesetMath(preview);
+}
+function refreshContentMathPreview() {
+  const preview = $("contentMathPreview"); if (!preview) return;
+  const content = $("contentBody")?.value || "";
+  preview.innerHTML = content ? esc(content).replace(/\n/g, "<br>") : "Type notes above to preview them.";
+  typesetMath(preview);
+}
+
+const DEFAULT_EXAMS = {
+  IOQM: { label: "Mathematics", sections: ["Number Theory (NT)", "Combinatorics", "Algebra", "Geometry"] },
+  NSEP: { label: "Physics", sections: ["Mechanics", "Electricity", "Optics", "Thermodynamics", "Waves"] },
+  NSEC: { label: "Chemistry", sections: ["Physical Chemistry", "Organic Chemistry", "Inorganic Chemistry"] },
+  NSEB: { label: "Biology", sections: ["Cell Biology", "Genetics", "Ecology", "Physiology", "Evolution"] }
+};
+let currentUser = null, busy = false, questions = [], sections = [], mockFormats = [], learningItems = [];
+function showStatus(message, isError = false) {
+  $("status").textContent = message;
+  $("status").style.color = isError ? "#b42318" : "#18794e";
+}
+function setBusy(value) {
+  busy = value;
+  ["loginButton", "saveButton", "refreshButton", "refreshSectionsButton", "saveSectionButton", "saveMockButton", "saveContentButton", "refreshContentButton"].forEach(id => {
+    if ($(id))
+      $(id).disabled = value;
+  });
+}
+function sectionOptions(olympiad, selected = "") {
+  const custom = sections.filter(x => x.olympiad === olympiad).map(x => x.name);
+  const defaults = DEFAULT_EXAMS[olympiad]?.sections || DEFAULT_EXAMS.IOQM.sections;
+  const sectionNames = [...new Set([...custom, ...defaults])];
+  $("topic").replaceChildren();
+  for (const section of sectionNames) {
+    const option = document.createElement("option");
+    option.value = section;
+    option.textContent = section;
+    $("topic").append(option);
+  }
+  if (sectionNames.includes(selected))
+    $("topic").value = selected;
+}
+$("olympiad").addEventListener("change", () => sectionOptions($("olympiad").value));
+$("questionType").addEventListener("change", updateQuestionTypeFields);
+["question", "option0", "option1", "option2", "option3", "hint", "solution"].forEach(id => $(id).addEventListener("input", () => { clearTimeout(window.__oplMathPreviewTimer); window.__oplMathPreviewTimer = setTimeout(refreshMathPreview, 180); }));
+$("questionType").addEventListener("change", refreshMathPreview);
+$("contentBody").addEventListener("input", () => { clearTimeout(window.__oplContentPreviewTimer); window.__oplContentPreviewTimer = setTimeout(refreshContentMathPreview, 180); });
+$("refreshReportsButton").addEventListener("click", loadQuestionReports);
+function updateQuestionTypeFields() {
+  const type = $("questionType").value;
+  const integer = type === "INTEGER", multi = type === "MULTIPLE_CORRECT";
+  $("mcqFields").hidden = integer;
+  $("mcqAnswerField").hidden = integer || multi;
+  $("multipleCorrectFields").hidden = !multi;
+  $("integerFields").hidden = !integer;
+  for (let i = 0;i < 4;i++)
+    $("option" + i).required = !integer;
+  $("answer").required = !integer && !multi;
+  $("integerAnswer").required = integer;
+}
+$("newQuestionButton").addEventListener("click", () => { resetForm(); $("editorCard").scrollIntoView({ behavior: "smooth", block: "start" }); $("question").focus(); });
+$("clearButton").addEventListener("click", resetForm);
+$("cancelButton").addEventListener("click", resetForm);
+$("refreshButton").addEventListener("click", loadQuestions);
+$("filterOlympiad").addEventListener("change", renderQuestions);
+$("filterPublication").addEventListener("change", renderQuestions);
+async function verifyAdmin() {
+  const { data: { user }, error: userError } = await db.auth.getUser();
+  if (userError || !user) {
+    currentUser = null;
+    showLogin();
+    return false;
+  }
+  const { data, error } = await db.from("admin_users").select("user_id").eq("user_id", user.id).maybeSingle();
+  if (error || !data) {
+    currentUser = null;
+    await db.auth.signOut();
+    showLogin();
+    showStatus(error ? "Could not verify admin access: " + error.message : "This account is not registered as an admin.", true);
+    return false;
+  }
+  currentUser = user;
+  $("loginCard").style.display = "none";
+  $("dashboard").style.display = "block";
+  $("logoutButton").hidden = false;
+  $("signedIn").textContent = "Signed in as " + (user.email || "admin");
+  showStatus("");
+  await loadQuestions();
+  await loadSections();
+  await loadMockFormats();
+  await loadLearningContent();
+  await loadQuestionReports();
+  refreshMathPreview();
+  return true;
+}
+function showLogin() {
+  $("dashboard").style.display = "none";
+  $("loginCard").style.display = "block";
+  $("logoutButton").hidden = true;
+}
+$("loginForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (busy)
+    return;
+  setBusy(true);
+  showStatus("Signing in...");
+  try {
+    const { error } = await db.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    if (error)
+      throw error;
+    await verifyAdmin();
+  }
+  catch (error) {
+    showStatus(error.message || "Login failed.", true);
+  }
+  finally {
+    setBusy(false);
+  }
+});
+$("logoutButton").addEventListener("click", async () => {
+  try {
+    const { error } = await db.auth.signOut();
+    if (error)
+      throw error;
+    currentUser = null;
+    showLogin();
+    resetForm();
+    showStatus("You have logged out.");
+  }
+  catch (error) {
+    showStatus(error.message || "Could not log out.", true);
+  }
+});
+async function verifySessionOnly() {
+  const { data: { user }, error } = await db.auth.getUser();
+  if (error || !user)
+    return false;
+  const { data, error: adminError } = await db.from("admin_users").select("user_id").eq("user_id", user.id).maybeSingle();
+  if (adminError || !data)
+    return false;
+  currentUser = user;
+  return true;
+}
+$("questionForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (busy)
+    return;
+  setBusy(true);
+  try {
+    if (!(await verifySessionOnly())) {
+      showStatus("Your session expired or admin access could not be verified. Please log in again.", true);
+      showLogin();
+      return;
+    }
+    const questionType = $("questionType").value;
+    const options = questionType === "INTEGER" ? [] : [0, 1, 2, 3].map(i => $("option" + i).value.trim());
+    if (questionType !== "INTEGER" && options.some(option => !option)) {
+      showStatus("Please fill in all four answer options.", true);
+      return;
+    }
+    const correctIndices = [...document.querySelectorAll(".correctOption:checked")].map(el => Number(el.value));
+    if (questionType === "MULTIPLE_CORRECT" && correctIndices.length === 0) {
+      showStatus("Select at least one correct option.", true);
+      return;
+    }
+    const integerText = $("integerAnswer").value.trim();
+    if (questionType === "INTEGER" && (integerText === "" || !Number.isSafeInteger(Number(integerText)))) {
+      showStatus("Enter a valid integer answer.", true);
+      return;
+    }
+    const imageUrl = $("imageUrl").value.trim();
+    if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+      showStatus("Use a full image URL beginning with https:// or http://.", true);
+      return;
+    }
+    const record = {
+      olympiad: $("olympiad").value,
+      topic: $("topic").value,
+      difficulty: $("difficulty").value,
+      question: $("question").value.trim(),
+      question_type: questionType,
+      image_url: imageUrl || null,
+      options,
+      answer_index: questionType === "MCQ" ? Number($("answer").value) : null,
+      correct_indices: questionType === "MULTIPLE_CORRECT" ? correctIndices : null,
+      integer_answer: questionType === "INTEGER" ? Number(integerText) : null,
+      hint: $("hint").value.trim(),
+      solution: $("solution").value.trim(),
+      published: $("published").checked,
+      updated_at: new Date().toISOString()
+    };
+    if (!record.question) {
+      showStatus("Enter the question statement.", true);
+      return;
+    }
+    const id = $("questionId").value;
+    let result;
+    if (id)
+      result = await db.from("questions").update(record).eq("id", Number(id));
+    else
+      result = await db.from("questions").insert(record);
+    if (result.error)
+      throw result.error;
+    showStatus(id ? "Question updated." : "Question created.");
+    resetForm();
+    await loadQuestions();
+  }
+  catch (error) {
+    const message = error.message || "Could not save the question.";
+    if (/column .*olympiad|olympiad.*does not exist/i.test(message))
+      showStatus("Database schema issue: the questions table is missing the olympiad column. Check the SQL schema before retrying. Details: " + message, true);
+    else if (/question_type_check|questions_question_type_check|violates check constraint/i.test(message))
+      showStatus("The database rejected this question type or its answer fields. This is a database constraint issue, not a publishing-button issue. Exact error: " + message, true);
+    else if (/row-level security|permission denied|not allowed/i.test(message))
+      showStatus("Database permission denied while saving. Check the questions-table RLS policy for authenticated admins. Details: " + message, true);
+    else
+      showStatus("Could not save question: " + message, true);
+  }
+  finally {
+    setBusy(false);
+  }
+});
+async function loadQuestions() {
+  if (!(await verifySessionOnly())) {
+    showLogin();
+    return;
+  }
+  $("questionList").textContent = "Loading questions...";
+  const { data, error } = await db.from("questions").select("*").order("created_at", { ascending: false });
+  if (error) {
+    $("questionList").textContent = "Could not load questions: " + error.message;
+    showStatus("Could not load questions.", true);
+    return;
+  }
+  questions = data || [];
+  renderQuestions();
+}
+function renderQuestions() {
+  const olympiad = $("filterOlympiad").value, status = $("filterPublication").value;
+  const filtered = questions.filter(item => (olympiad === "ALL" || normalOlympiad(item.olympiad) === olympiad) && (status === "ALL" || (status === "PUBLISHED" && item.published) || (status === "DRAFT" && !item.published)));
+  $("summary").textContent = questions.length + " total · " + questions.filter(q => q.published).length + " published · " + questions.filter(q => !q.published).length + " drafts";
+  const list = $("questionList");
+  list.replaceChildren();
+  if (!filtered.length) {
+    list.textContent = questions.length ? "No questions match these filters." : "No questions yet. Add your first question above.";
+    return;
+  }
+  for (const item of filtered) {
+    const card = document.createElement("article");
+    card.className = "question";
+    const top = document.createElement("div");
+    top.className = "question-top";
+    const heading = document.createElement("div");
+    const title = document.createElement("h3");
+    title.textContent = (normalOlympiad(item.olympiad) || "IOQM") + " · " + (item.topic || "Uncategorised");
+    heading.append(title);
+    const pill = document.createElement("span");
+    pill.className = "pill";
+    pill.textContent = item.published ? "PUBLISHED" : "DRAFT";
+    top.append(heading, pill);
+    const difficulty = document.createElement("div");
+    difficulty.className = "muted";
+    difficulty.textContent = "Difficulty: " + (item.difficulty || "Not set");
+    const statement = document.createElement("p");
+    statement.textContent = item.question || "(Empty question)";
+    const opts = document.createElement("p");
+    opts.className = "muted";
+    opts.textContent = String(item.question_type).toUpperCase() === "INTEGER" ? "Integer answer: " + (item.integer_answer ?? "Not set") : "A. " + (item.options?.[0] || "") + " · B. " + (item.options?.[1] || "") + " · C. " + (item.options?.[2] || "") + " · D. " + (item.options?.[3] || "") + (String(item.question_type).toUpperCase() === "MULTIPLE_CORRECT" ? " · Correct: " + (item.correct_indices || []).map(i => String.fromCharCode(65 + Number(i))).join(", ") : "");
+    if (item.image_url) {
+      const imageNote = document.createElement("p");
+      imageNote.className = "muted";
+      imageNote.textContent = "Includes question image";
+      card.append(top, difficulty, statement, opts, imageNote);
+    }
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const edit = document.createElement("button");
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editQuestion(item));
+    const toggle = document.createElement("button");
+    toggle.className = "green";
+    toggle.textContent = item.published ? "Unpublish" : "Publish";
+    toggle.addEventListener("click", () => togglePublished(item));
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", () => deleteQuestion(item));
+    actions.append(edit, toggle, remove);
+    if (item.image_url)
+      card.append(actions);
+    else
+      card.append(top, difficulty, statement, opts, actions);
+    list.append(card);
+  }
+  typesetMath(list);
+}
+function normalOlympiad(value) { return ["IOQM", "NSEP", "NSEC", "NSEB"].includes(value) ? value : "IOQM"; }
+function editQuestion(item) {
+  $("questionId").value = item.id;
+  $("olympiad").value = normalOlympiad(item.olympiad);
+  sectionOptions($("olympiad").value, item.topic);
+  $("difficulty").value = item.difficulty || "Beginner";
+  $("question").value = item.question || "";
+  $("questionType").value = String(item.question_type).toUpperCase() === "INTEGER" ? "INTEGER" : (String(item.question_type).toUpperCase() === "MULTIPLE_CORRECT" ? "MULTIPLE_CORRECT" : "MCQ");
+  $("integerAnswer").value = item.integer_answer ?? "";
+  $("imageUrl").value = item.image_url || "";
+  updateQuestionTypeFields();
+  const options = Array.isArray(item.options) ? item.options : [];
+  for (let i = 0;i < 4;i++)
+    $("option" + i).value = options[i] || "";
+  $("answer").value = String(Number(item.answer_index) || 0);
+  document.querySelectorAll(".correctOption").forEach(el => el.checked = (item.correct_indices || []).map(Number).includes(Number(el.value)));
+  $("hint").value = item.hint || "";
+  $("solution").value = item.solution || "";
+  refreshMathPreview();
+  $("published").checked = !!item.published;
+  $("formTitle").textContent = "Edit question";
+  $("saveButton").textContent = "Update question";
+  $("cancelButton").hidden = false;
+  $("editorCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+async function togglePublished(item) {
+  if (!(await verifySessionOnly())) {
+    showStatus("Please log in again.", true);
+    showLogin();
+    return;
+  }
+  const { error } = await db.from("questions").update({ published: !item.published, updated_at: new Date().toISOString() }).eq("id", item.id);
+  if (error) {
+    showStatus(error.message, true);
+    return;
+  }
+  showStatus(item.published ? "Question unpublished." : "Question published.");
+  await loadQuestions();
+}
+async function deleteQuestion(item) {
+  if (!confirm("Delete this question permanently? This cannot be undone."))
+    return;
+  if (!(await verifySessionOnly())) {
+    showStatus("Please log in again.", true);
+    showLogin();
+    return;
+  }
+  const { error } = await db.from("questions").delete().eq("id", item.id);
+  if (error) {
+    showStatus(error.message, true);
+    return;
+  }
+  if (String($("questionId").value) === String(item.id))
+    resetForm();
+  showStatus("Question deleted.");
+  await loadQuestions();
+}
+function resetForm() {
+  $("questionForm").reset();
+  $("questionId").value = "";
+  $("olympiad").value = "IOQM";
+  sectionOptions("IOQM");
+  updateQuestionTypeFields();
+  $("difficulty").value = "Beginner";
+  refreshMathPreview();
+  $("formTitle").textContent = "Add a question";
+  $("saveButton").textContent = "Save question";
+  $("cancelButton").hidden = true;
+}
+// Dynamic section management. Keep database failures visible rather than silently
+// leaving the question editor with only its built-in defaults.
+async function loadSections() {
+  const list = $("sectionList"), warning = $("sectionLoadWarning");
+  list.textContent = "Loading sections...";
+  warning.hidden = true;
+  warning.textContent = "";
+  try {
+    const { data, error } = await db.from("sections").select("*").order("olympiad").order("name");
+    if (error)
+      throw error;
+    sections = data || [];
+    sectionOptions($("olympiad").value, $("topic").value);
+    renderSections();
+    return true;
+  }
+  catch (error) {
+    const message = error?.message || String(error) || "Unknown error";
+    sections = [];
+    sectionOptions($("olympiad").value, $("topic").value);
+    list.textContent = "Custom sections could not be loaded.";
+    warning.hidden = false;
+    warning.textContent = "Could not load public.sections: " + message + ". Built-in sections remain available, but saved custom sections will not appear until this database access issue is fixed.";
+    showStatus("Section loading failed: " + message, true);
+    return false;
+  }
+}
+function renderSections() {
+  const box = $("sectionList");
+  box.replaceChildren();
+  if (!sections.length) {
+    box.textContent = "No custom sections saved. Built-in defaults remain available in the question form.";
+    return;
+  }
+  for (const item of sections) {
+    const row = document.createElement("div");
+    row.className = "question";
+    const title = document.createElement("div");
+    title.className = "question-top";
+    const name = document.createElement("strong");
+    name.textContent = item.olympiad + " · " + item.name;
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const edit = document.createElement("button");
+    edit.className = "secondary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => { $("sectionId").value = item.id; $("sectionOlympiad").value = item.olympiad; $("sectionName").value = item.name; $("saveSectionButton").textContent = "Update section"; $("cancelSectionButton").hidden = false; $("sectionManager").scrollIntoView({ behavior: "smooth", block: "start" }); });
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteSection(item));
+    actions.append(edit, del);
+    title.append(name);
+    row.append(title, actions);
+    box.append(row);
+  }
+}
+$("refreshSectionsButton").addEventListener("click", () => loadSections());
+$("sectionForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (busy)
+    return;
+  if (!(await verifySessionOnly())) {
+    showLogin();
+    showStatus("Please log in again before managing sections.", true);
+    return;
+  }
+  const id = $("sectionId").value;
+  const record = { olympiad: $("sectionOlympiad").value, name: $("sectionName").value.trim() };
+  if (!record.name) {
+    showStatus("Enter a section name.", true);
+    return;
+  }
+  setBusy(true);
+  showStatus(id ? "Updating section..." : "Creating section...");
+  try {
+    const result = id ? await db.from("sections").update(record).eq("id", Number(id)) : await db.from("sections").insert(record);
+    if (result.error)
+      throw result.error;
+    resetSectionForm();
+    await loadSections();
+    showStatus(id ? "Section updated." : "Section added.");
+  }
+  catch (error) {
+    showStatus("Could not save section: " + (error?.message || String(error)), true);
+  }
+  finally {
+    setBusy(false);
+  }
+});
+$("cancelSectionButton").addEventListener("click", resetSectionForm);
+function resetSectionForm() { $("sectionForm").reset(); $("sectionId").value = ""; $("saveSectionButton").textContent = "Add section"; $("cancelSectionButton").hidden = true; }
+async function deleteSection(item) {
+  if (!confirm("Delete section '" + item.name + "'? Questions already assigned to it are not deleted, but may remain under an existing topic name."))
+    return;
+  if (!(await verifySessionOnly())) {
+    showStatus("Please log in again.", true);
+    showLogin();
+    return;
+  }
+  try {
+    const { error } = await db.from("sections").delete().eq("id", item.id);
+    if (error)
+      throw error;
+    await loadSections();
+    showStatus("Section deleted.");
+  }
+  catch (error) {
+    showStatus("Could not delete section: " + (error?.message || String(error)), true);
+  }
+}
+// Admin-managed theory notes and IOQM problem-solving resources.
+function updateContentExamAvailability() {
+  const isProblemSolving = $("contentType").value === "PROBLEM_SOLVING"; if (isProblemSolving) {
+    $("contentExam").value = "IOQM";
+    $("contentExam").disabled = true;
+  }
+  else {
+    $("contentExam").disabled = false;
+  }
+}
+$("contentType").addEventListener("change", updateContentExamAvailability);
+$("clearContentButton").addEventListener("click", resetContentForm);
+$("cancelContentButton").addEventListener("click", resetContentForm);
+$("refreshContentButton").addEventListener("click", loadLearningContent);
+function resetContentForm() { $("contentForm").reset(); $("contentId").value = ""; $("contentType").value = "THEORY"; $("contentExam").disabled = false; $("contentOrder").value = 0; $('contentPublished').checked = false; $('saveContentButton').textContent = "Save content"; $('cancelContentButton').hidden = true; updateContentExamAvailability(); }
+$("contentForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (busy)
+    return;
+  if (!(await verifySessionOnly())) {
+    showLogin();
+    showStatus("Please log in again before managing content.", true);
+    return;
+  }
+  const id = $("contentId").value;
+  const contentType = $("contentType").value;
+  const examCode = contentType === "PROBLEM_SOLVING" ? "IOQM" : $("contentExam").value;
+  const record = { content_type: contentType, exam_code: examCode, title: $("contentTitle").value.trim(), section: $("contentSection").value.trim(), content: $("contentBody").value.trim(), display_order: Number($("contentOrder").value) || 0, published: $("contentPublished").checked, updated_at: new Date().toISOString() };
+  if (!record.title || !record.content) {
+    showStatus("Enter a title and content body.", true);
+    return;
+  }
+  setBusy(true);
+  showStatus(id ? "Updating content..." : "Saving content...");
+  try {
+    const result = id ? await db.from("learning_content").update(record).eq("id", Number(id)) : await db.from("learning_content").insert(record);
+    if (result.error)
+      throw result.error;
+    resetContentForm();
+    await loadLearningContent();
+    showStatus(id ? "Content updated." : "Content saved.");
+  }
+  catch (error) {
+    showStatus("Could not save learning content: " + (error?.message || String(error)) + ". If the learning_content table has not been created, run the supplied SQL migration first.", true);
+  }
+  finally {
+    setBusy(false);
+  }
+});
+async function loadLearningContent() {
+  if (!(await verifySessionOnly())) {
+    showLogin();
+    return;
+  }
+  const box = $("contentList");
+  box.textContent = "Loading learning content...";
+  try {
+    const { data, error } = await db.from("learning_content").select("*").order("content_type").order("exam_code").order("display_order").order("created_at");
+    if (error)
+      throw error;
+    learningItems = data || [];
+    renderLearningContent();
+  }
+  catch (error) {
+    box.textContent = "Could not load learning content: " + (error?.message || String(error));
+    showStatus("Could not load learning content. Run the learning-content SQL migration if this is a new setup.", true);
+  }
+}
+function renderLearningContent() {
+  const box = $("contentList"); box.replaceChildren(); if (!learningItems.length) {
+    box.textContent = "No theory notes or problem-solving guides yet. Add one above.";
+    return;
+  } for (const item of learningItems) {
+    const card = document.createElement("article");
+    card.className = "question";
+    const top = document.createElement("div");
+    top.className = "question-top";
+    const title = document.createElement("h3");
+    title.textContent = (item.content_type === "PROBLEM_SOLVING" ? "IOQM Problem Solving" : item.exam_code + " Theory") + " · " + item.title;
+    const pill = document.createElement("span");
+    pill.className = "pill";
+    pill.textContent = item.published ? "PUBLISHED" : "DRAFT";
+    top.append(title, pill);
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    detail.textContent = (item.section ? item.section + " · " : "") + "Order: " + item.display_order + " · " + (item.content || "").length + " characters";
+    const preview = document.createElement("p");
+    preview.textContent = (item.content || "").slice(0, 240) + (item.content?.length > 240 ? "…" : "");
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const edit = document.createElement("button");
+    edit.className = "secondary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editLearningContent(item));
+    const toggle = document.createElement("button");
+    toggle.className = "green";
+    toggle.textContent = item.published ? "Unpublish" : "Publish";
+    toggle.addEventListener("click", () => toggleLearningContent(item));
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteLearningContent(item));
+    actions.append(edit, toggle, del);
+    preview.className = "math-content";
+    card.append(top, detail, preview, actions);
+    box.append(card);
+  }
+  typesetMath(box);
+}
+function editLearningContent(item) { $("contentId").value = item.id; $("contentType").value = item.content_type; $("contentExam").disabled = false; $("contentExam").value = item.exam_code; updateContentExamAvailability(); $("contentTitle").value = item.title; $("contentSection").value = item.section || ""; $("contentBody").value = item.content; $("contentOrder").value = item.display_order || 0; $("contentPublished").checked = !!item.published; $("saveContentButton").textContent = "Update content"; $("cancelContentButton").hidden = false; refreshContentMathPreview(); $("contentManager").scrollIntoView({ behavior: "smooth", block: "start" }); }
+async function toggleLearningContent(item) {
+  if (!(await verifySessionOnly())) {
+    showLogin();
+    return;
+  } const { error } = await db.from("learning_content").update({ published: !item.published, updated_at: new Date().toISOString() }).eq("id", item.id); if (error) {
+    showStatus(error.message, true);
+    return;
+  } await loadLearningContent(); showStatus(item.published ? "Content unpublished." : "Content published.");
+}
+async function deleteLearningContent(item) {
+  if (!confirm("Permanently delete '" + item.title + "'?"))
+    return; if (!(await verifySessionOnly())) {
+      showLogin();
+      return;
+    } const { error } = await db.from("learning_content").delete().eq("id", item.id); if (error) {
+      showStatus(error.message, true);
+      return;
+    } await loadLearningContent(); showStatus("Content deleted.");
+}
+// Mock-test format management
+function selectedMockTypes() { return [...$("mockTypes").selectedOptions].map(o => o.value); }
+function resetMockForm() { $("mockForm").reset(); $("mockId").value = ""; $("mockDuration").value = 180; $("mockCount").value = 30; $("mockPositive").value = 1; $("mockNegative").value = 0; $("mockUnattempted").value = 0; $("mockActive").checked = true;[...$("mockTypes").options].forEach(o => o.selected = o.value === "MCQ"); $("saveMockButton").textContent = "Save mock format"; $("cancelMockButton").hidden = true; }
+$("clearMockButton").addEventListener("click", resetMockForm);
+$("cancelMockButton").addEventListener("click", resetMockForm);
+$("mockForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); if (!(await verifySessionOnly())) {
+    showLogin();
+    return;
+  } const types = selectedMockTypes(); if (!types.length) {
+    showStatus("Select at least one allowed question type.", true);
+    return;
+  } const id = $("mockId").value; const record = { exam_code: $("mockExam").value, name: $("mockName").value.trim(), duration_minutes: Number($("mockDuration").value), question_count: Number($("mockCount").value), marks_correct: Number($("mockPositive").value), marks_wrong: Number($("mockNegative").value), marks_unattempted: Number($("mockUnattempted").value), total_marks: $("mockTotal").value === "" ? null : Number($("mockTotal").value), question_types: types, description: $("mockDescription").value.trim(), active: $("mockActive").checked, updated_at: new Date().toISOString() }; if (!record.name || record.duration_minutes < 1 || record.question_count < 1) {
+    showStatus("Enter a name, valid duration, and positive question count.", true);
+    return;
+  } const result = id ? await db.from("mock_formats").update(record).eq("id", Number(id)) : await db.from("mock_formats").insert(record); if (result.error) {
+    showStatus(result.error.message, true);
+    return;
+  } resetMockForm(); await loadMockFormats(); showStatus(id ? "Mock format updated." : "Mock format created.");
+});
+async function loadMockFormats() {
+  const { data, error } = await db.from("mock_formats").select("*").order("exam_code").order("name"); if (error) {
+    $("mockList").textContent = "Could not load mock formats: " + error.message;
+    return;
+  } mockFormats = data || []; renderMockFormats();
+}
+function renderMockFormats() {
+  const box = $("mockList"); box.replaceChildren(); if (!mockFormats.length) {
+    box.textContent = "No mock formats yet. Create one above.";
+    return;
+  } for (const item of mockFormats) {
+    const card = document.createElement("article");
+    card.className = "question";
+    const title = document.createElement("h3");
+    title.textContent = item.exam_code + " · " + item.name;
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    detail.textContent = `${item.duration_minutes} min · ${item.question_count} questions · +${item.marks_correct} / −${item.marks_wrong} / unattempted ${item.marks_unattempted} · Types: ${(item.question_types || []).join(", ")} · ${item.active ? "Available" : "Disabled"}${item.total_marks == null ? "" : " · Total marks: " + item.total_marks}`;
+    card.append(title, detail);
+    if (item.description) {
+      const d = document.createElement("p");
+      d.textContent = item.description;
+      card.append(d);
+    }
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const edit = document.createElement("button");
+    edit.className = "secondary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editMockFormat(item));
+    const toggle = document.createElement("button");
+    toggle.className = "green";
+    toggle.textContent = item.active ? "Disable" : "Enable";
+    toggle.addEventListener("click", () => toggleMockFormat(item));
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteMockFormat(item));
+    actions.append(edit, toggle, del);
+    card.append(actions);
+    box.append(card);
+  }
+}
+function editMockFormat(item) { $("mockId").value = item.id; $("mockExam").value = item.exam_code; $("mockName").value = item.name; $("mockDuration").value = item.duration_minutes; $("mockCount").value = item.question_count; $("mockPositive").value = item.marks_correct; $("mockNegative").value = item.marks_wrong; $("mockUnattempted").value = item.marks_unattempted; $("mockTotal").value = item.total_marks ?? ""; $("mockDescription").value = item.description || ""; $("mockActive").checked = !!item.active;[...$("mockTypes").options].forEach(o => o.selected = (item.question_types || []).includes(o.value)); $("saveMockButton").textContent = "Update mock format"; $("cancelMockButton").hidden = false; $("mockManager").scrollIntoView({ behavior: "smooth", block: "start" }); }
+async function toggleMockFormat(item) {
+  const { error } = await db.from("mock_formats").update({ active: !item.active, updated_at: new Date().toISOString() }).eq("id", item.id); if (error) {
+    showStatus(error.message, true);
+    return;
+  } await loadMockFormats(); showStatus(item.active ? "Mock format disabled." : "Mock format enabled.");
+}
+async function deleteMockFormat(item) {
+  if (!confirm("Permanently delete mock format '" + item.name + "'? This does not delete questions."))
+    return; const { error } = await db.from("mock_formats").delete().eq("id", item.id); if (error) {
+      showStatus(error.message, true);
+      return;
+    } await loadMockFormats(); showStatus("Mock format deleted.");
+}
+async function loadQuestionReports() {
+  const list = $("reportList"), summary = $("reportSummary");
+  if (!currentUser) { list.textContent = "Sign in to view reports."; return; }
+  list.textContent = "Loading reports...";
+  try {
+    const { data, error } = await db.from("question_reports").select("*").order("created_at", { ascending: false }).limit(200);
+    if (error) throw error;
+    reportItems = data || [];
+    summary.textContent = `${reportItems.length} reports · ${reportItems.filter(x => x.status !== "resolved").length} open · ${reportItems.filter(x => x.status === "resolved").length} resolved`;
+    list.replaceChildren();
+    if (!reportItems.length) { list.textContent = "No reports yet. When students report a question, it will appear here."; return; }
+    for (const item of reportItems) {
+      const card = document.createElement("article"); card.className = "report-item" + (item.status === "resolved" ? " resolved" : "");
+      const top = document.createElement("div"); top.className = "report-meta";
+      const label = document.createElement("strong"); label.textContent = item.report_type || "Report"; top.append(label);
+      const status = document.createElement("span"); status.className = "pill"; status.textContent = item.status || "new"; top.append(status);
+      const meta = document.createElement("p"); meta.className = "muted"; meta.textContent = `${item.exam_code || "?"} · ${item.topic || "General"} · Question ${item.question_id || "?"} · ${item.created_at ? new Date(item.created_at).toLocaleString() : "date unknown"}`;
+      const question = document.createElement("div"); question.className = "math-content"; question.textContent = item.question_text || "Question text unavailable";
+      const message = document.createElement("p"); message.className = "report-message"; message.textContent = item.message || "No additional details supplied.";
+      const actions = document.createElement("div"); actions.className = "actions";
+      const toggle = document.createElement("button"); toggle.className = "secondary"; toggle.type = "button"; toggle.textContent = item.status === "resolved" ? "Reopen report" : "Mark resolved"; toggle.addEventListener("click", () => setReportStatus(item, item.status === "resolved" ? "new" : "resolved"));
+      actions.append(toggle); card.append(top, meta, question, message, actions); list.append(card);
+    }
+    typesetMath(list);
+  } catch (error) {
+    list.textContent = "Could not load question reports: " + (error?.message || String(error)) + ". Run question-reports.sql in Supabase if this table has not been created.";
+    summary.textContent = "Reports unavailable";
+  }
+}
+async function setReportStatus(item, status) {
+  if (!(await verifySessionOnly())) { showLogin(); showStatus("Please log in again.", true); return; }
+  const { error } = await db.from("question_reports").update({ status }).eq("id", item.id);
+  if (error) { showStatus("Could not update report: " + error.message, true); return; }
+  showStatus(status === "resolved" ? "Report marked resolved." : "Report reopened.");
+  await loadQuestionReports();
+}
+db.auth.onAuthStateChange((event) => {
+  if (event === "SIGNED_OUT") {
+    currentUser = null;
+    showLogin();
+  }
+});
+sectionOptions("IOQM");
+updateQuestionTypeFields();
+updateContentExamAvailability();
+verifyAdmin().catch(error => { showLogin(); showStatus(error.message || "Could not initialize admin panel.", true); });
+window.addEventListener("load", () => { typesetMath(); refreshMathPreview(); refreshContentMathPreview(); });
+  </script>
+ </body>
+</html>
